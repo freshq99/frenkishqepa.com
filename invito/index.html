@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -27,13 +26,304 @@
 		body {
 			min-height: 100vh;
 			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+			color: #111827;
+			background: #ffffff;
+			overflow: auto;
+			display: grid;
+			place-items: center;
+			padding: 20px;
+		}
+
+		body.unlocked {
 			color: var(--text);
 			background: radial-gradient(circle at 20% 20%, #53206b 0%, transparent 40%),
 									radial-gradient(circle at 80% 15%, #34175c 0%, transparent 35%),
 									linear-gradient(130deg, var(--bg1), var(--bg2));
 			overflow: hidden;
+		}
+
+		.hearts {
+			position: fixed;
+			inset: 0;
+			overflow: hidden;
+			pointer-events: none;
+			z-index: 0;
+			display: none;
+		}
+
+		body.unlocked .hearts {
+			display: block;
+		}
+
+		.heart {
+			position: absolute;
+			bottom: -30px;
+			color: var(--rose-soft);
+			animation: floatUp linear infinite;
+			opacity: 0.7;
+			filter: drop-shadow(0 0 6px rgba(255, 134, 175, 0.6));
+		}
+
+		@keyframes floatUp {
+			0% {
+				transform: translateY(0) translateX(0) scale(0.7) rotate(0deg);
+				opacity: 0;
+			}
+			10% {
+				opacity: 0.8;
+			}
+			100% {
+				transform: translateY(-110vh) translateX(30px) scale(1.2) rotate(20deg);
+				opacity: 0;
+			}
+		}
+
+		.card {
+			position: relative;
+			z-index: 2;
+			width: min(460px, 95vw);
+			background: #ffffff;
+			border: 1px solid #e5e7eb;
+			border-radius: 16px;
+			padding: 26px;
+			text-align: center;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+			animation: rise 700ms ease-out;
+		}
+
+		body.unlocked .card {
+			width: min(760px, 96vw);
+			background: var(--glass);
+			border: 1px solid var(--border);
+			border-radius: 24px;
+			backdrop-filter: blur(10px);
+			box-shadow: 0 14px 38px rgba(0, 0, 0, 0.35);
+		}
+
+		@keyframes rise {
+			from {
+				transform: translateY(16px);
+				opacity: 0;
+			}
+			to {
+				transform: translateY(0);
+				opacity: 1;
+			}
+		}
+
+		h1 {
+			font-size: clamp(1.8rem, 3vw, 2.6rem);
+			margin-bottom: 8px;
+			color: #111827;
+		}
+
+		body.unlocked h1 {
+			color: var(--text);
+		}
+
+		.subtitle {
+			opacity: 1;
+			color: #4b5563;
+			margin-bottom: 22px;
+			font-size: 1.02rem;
+		}
+
+		body.unlocked .subtitle {
+			opacity: 0.9;
+			color: var(--text);
+		}
+
+		.password-box {
 			display: grid;
-			place-items: center;
+			gap: 12px;
+			width: min(420px, 100%);
+			margin: 0 auto;
+		}
+
+		input[type="password"] {
+			width: 100%;
+			border-radius: 12px;
+			border: 1px solid #d1d5db;
+			background: #ffffff;
+			color: #111827;
+			padding: 12px 14px;
+			font-size: 1rem;
+			outline: none;
+		}
+
+		body.unlocked input[type="password"] {
+			border: 1px solid rgba(255, 255, 255, 0.25);
+			background: rgba(0, 0, 0, 0.2);
+			color: white;
+		}
+
+		input[type="password"]:focus {
+			border-color: var(--rose-soft);
+			box-shadow: 0 0 0 3px rgba(255, 134, 175, 0.2);
+		}
+
+		button {
+			border: none;
+			border-radius: 999px;
+			padding: 12px 20px;
+			background: #111827;
+			color: #fff;
+			font-size: 1rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: transform 150ms ease, filter 150ms ease;
+		}
+
+		body.unlocked button {
+			background: linear-gradient(90deg, var(--rose), #ff6ca5);
+		}
+
+		button:hover {
+			transform: translateY(-1px);
+			filter: brightness(1.05);
+		}
+
+		.hint,
+		.error {
+			font-size: 0.92rem;
+			opacity: 0.9;
+		}
+
+		.hint {
+			color: #6b7280;
+		}
+
+		body.unlocked .hint {
+			color: var(--text);
+		}
+
+		.error {
+			color: #ffd3e3;
+			min-height: 20px;
+		}
+
+		.invite {
+			display: none;
+			text-align: left;
+			line-height: 1.7;
+			margin-top: 12px;
+			background: rgba(0, 0, 0, 0.2);
+			border: 1px solid rgba(255, 255, 255, 0.16);
+			border-radius: 16px;
+			padding: 18px;
+		}
+
+		.invite strong {
+			color: #ffd9e8;
+		}
+
+		.show {
+			display: block;
+			animation: rise 500ms ease;
+		}
+	</style>
+</head>
+<body>
+	<div class="hearts" id="hearts"></div>
+
+	<main class="card">
+		<h1 id="heroTitle">Area riservata</h1>
+		<p class="subtitle" id="heroSubtitle">Inserisci la password per continuare.</p>
+
+		<form id="gate" class="password-box" autocomplete="off">
+			<input id="password" type="password" placeholder="Inserisci la password" required>
+			<button id="gateButton" type="submit">Accedi</button>
+			<p class="hint" id="hintText">Solo persone autorizzate.</p>
+			<p class="error" id="error"></p>
+		</form>
+
+		<section class="invite" id="invite">
+			<p><strong>SAMPLE 1 (romantico):</strong></p>
+			<p>Ciao [NOME],</p>
+			<p>ho preparato questa paginetta solo per dirti una cosa:</p>
+			<p><strong>ti va di uscire con me [GIORNO/ORARIO]?</strong> 🌹</p>
+			<p>Prometto [PIANO BREVE: es. passeggiata + cena + gelato].</p>
+			<p>Se ci stai, scrivimi: <strong>"Sì, ci sono 💋"</strong></p>
+
+			<p style="margin-top:14px;"><strong>SAMPLE 2 (simpatico):</strong></p>
+			<p>Breaking news 🗞️: sei stata selezionata per un appuntamento premium.</p>
+			<p><strong>Data:</strong> [DATA] · <strong>Ora:</strong> [ORA] · <strong>Location:</strong> [POSTO]</p>
+			<p>Dress code consigliato: [STILE].</p>
+			<p>Conferma inviando: <strong>"Accetto la missione 🚀"</strong></p>
+
+			<p style="margin-top:14px;"><strong>SAMPLE 3 (dolce e corto):</strong></p>
+			<p>Mi piaci un sacco. Fine del messaggio.</p>
+			<p>Anzi no, manca la parte importante:</p>
+			<p><strong>uscita insieme [GIORNO]?</strong> ✨</p>
+			<p style="margin-top:10px;">Firmato,<br><strong>[TUO NOME] 💘</strong></p>
+		</section>
+	</main>
+
+	<script>
+		const PASSWORD_HASH = "d0871a4785893e1a0ecfe3e9ca0acb920b7e93e9b57bffdbaa99b345893fba19";
+		const STORAGE_KEY = "invito_sbloccato";
+
+		const heartsContainer = document.getElementById("hearts");
+		const gate = document.getElementById("gate");
+		const passwordInput = document.getElementById("password");
+		const invite = document.getElementById("invite");
+		const error = document.getElementById("error");
+		const heroTitle = document.getElementById("heroTitle");
+		const heroSubtitle = document.getElementById("heroSubtitle");
+		const hintText = document.getElementById("hintText");
+		const body = document.body;
+
+		function createHearts() {
+			for (let i = 0; i < 24; i++) {
+				const heart = document.createElement("span");
+				heart.className = "heart";
+				heart.textContent = "❤";
+				heart.style.left = `${Math.random() * 100}vw`;
+				heart.style.fontSize = `${12 + Math.random() * 18}px`;
+				heart.style.animationDuration = `${7 + Math.random() * 8}s`;
+				heart.style.animationDelay = `${Math.random() * 6}s`;
+				heartsContainer.appendChild(heart);
+			}
+		}
+
+		async function sha256(text) {
+			const buffer = new TextEncoder().encode(text);
+			const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+			const hashArray = Array.from(new Uint8Array(hashBuffer));
+			return hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("");
+		}
+
+		function unlock() {
+			body.classList.add("unlocked");
+			heroTitle.textContent = "[SAMPLE TITOLO] ✨";
+			heroSubtitle.textContent = "[SAMPLE SOTTOTITOLO: qui scrivi una frase breve e dolce] 💗";
+			hintText.textContent = "";
+			gate.style.display = "none";
+			invite.classList.add("show");
+		}
+
+		gate.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			error.textContent = "";
+
+			const candidateHash = await sha256(passwordInput.value.trim());
+			if (candidateHash === PASSWORD_HASH) {
+				localStorage.setItem(STORAGE_KEY, "ok");
+				unlock();
+			} else {
+				error.textContent = "Password non corretta. Riprova 💫";
+			}
+		});
+
+		if (localStorage.getItem(STORAGE_KEY) === "ok") {
+			unlock();
+		}
+
+		createHearts();
+	</script>
+</body>
+</html>
+
 			padding: 20px;
 		}
 
