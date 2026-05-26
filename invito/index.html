@@ -1,1 +1,259 @@
 
+<!DOCTYPE html>
+<html lang="it">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+	<meta name="googlebot" content="noindex, nofollow">
+	<title>Un invito per te 💌</title>
+	<style>
+		:root {
+			--bg1: #0f1020;
+			--bg2: #2b1857;
+			--rose: #ff4f8b;
+			--rose-soft: #ff86af;
+			--text: #fff7fb;
+			--glass: rgba(255, 255, 255, 0.14);
+			--border: rgba(255, 255, 255, 0.25);
+		}
+
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			min-height: 100vh;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+			color: var(--text);
+			background: radial-gradient(circle at 20% 20%, #53206b 0%, transparent 40%),
+									radial-gradient(circle at 80% 15%, #34175c 0%, transparent 35%),
+									linear-gradient(130deg, var(--bg1), var(--bg2));
+			overflow: hidden;
+			display: grid;
+			place-items: center;
+			padding: 20px;
+		}
+
+		.hearts {
+			position: fixed;
+			inset: 0;
+			overflow: hidden;
+			pointer-events: none;
+			z-index: 0;
+		}
+
+		.heart {
+			position: absolute;
+			bottom: -30px;
+			color: var(--rose-soft);
+			animation: floatUp linear infinite;
+			opacity: 0.7;
+			filter: drop-shadow(0 0 6px rgba(255, 134, 175, 0.6));
+		}
+
+		@keyframes floatUp {
+			0% {
+				transform: translateY(0) translateX(0) scale(0.7) rotate(0deg);
+				opacity: 0;
+			}
+			10% {
+				opacity: 0.8;
+			}
+			100% {
+				transform: translateY(-110vh) translateX(30px) scale(1.2) rotate(20deg);
+				opacity: 0;
+			}
+		}
+
+		.card {
+			position: relative;
+			z-index: 2;
+			width: min(760px, 96vw);
+			background: var(--glass);
+			border: 1px solid var(--border);
+			border-radius: 24px;
+			backdrop-filter: blur(10px);
+			padding: 26px;
+			text-align: center;
+			box-shadow: 0 14px 38px rgba(0, 0, 0, 0.35);
+			animation: rise 700ms ease-out;
+		}
+
+		@keyframes rise {
+			from {
+				transform: translateY(16px);
+				opacity: 0;
+			}
+			to {
+				transform: translateY(0);
+				opacity: 1;
+			}
+		}
+
+		h1 {
+			font-size: clamp(1.8rem, 3vw, 2.6rem);
+			margin-bottom: 8px;
+		}
+
+		.subtitle {
+			opacity: 0.9;
+			margin-bottom: 22px;
+			font-size: 1.02rem;
+		}
+
+		.password-box {
+			display: grid;
+			gap: 12px;
+			width: min(420px, 100%);
+			margin: 0 auto;
+		}
+
+		input[type="password"] {
+			width: 100%;
+			border-radius: 12px;
+			border: 1px solid rgba(255, 255, 255, 0.25);
+			background: rgba(0, 0, 0, 0.2);
+			color: white;
+			padding: 12px 14px;
+			font-size: 1rem;
+			outline: none;
+		}
+
+		input[type="password"]:focus {
+			border-color: var(--rose-soft);
+			box-shadow: 0 0 0 3px rgba(255, 134, 175, 0.2);
+		}
+
+		button {
+			border: none;
+			border-radius: 999px;
+			padding: 12px 20px;
+			background: linear-gradient(90deg, var(--rose), #ff6ca5);
+			color: #fff;
+			font-size: 1rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: transform 150ms ease, filter 150ms ease;
+		}
+
+		button:hover {
+			transform: translateY(-1px);
+			filter: brightness(1.05);
+		}
+
+		.hint,
+		.error {
+			font-size: 0.92rem;
+			opacity: 0.9;
+		}
+
+		.error {
+			color: #ffd3e3;
+			min-height: 20px;
+		}
+
+		.invite {
+			display: none;
+			text-align: left;
+			line-height: 1.7;
+			margin-top: 12px;
+			background: rgba(0, 0, 0, 0.2);
+			border: 1px solid rgba(255, 255, 255, 0.16);
+			border-radius: 16px;
+			padding: 18px;
+		}
+
+		.invite strong {
+			color: #ffd9e8;
+		}
+
+		.show {
+			display: block;
+			animation: rise 500ms ease;
+		}
+	</style>
+</head>
+<body>
+	<div class="hearts" id="hearts"></div>
+
+	<main class="card">
+		<h1>Per la mia persona preferita ✨</h1>
+		<p class="subtitle">Ho preparato un invito speciale. Solo tu puoi aprirlo 💗</p>
+
+		<form id="gate" class="password-box" autocomplete="off">
+			<input id="password" type="password" placeholder="Inserisci la password" required>
+			<button type="submit">Apri il messaggio</button>
+			<p class="hint">Suggerimento: è una parola che ti chiama sempre con dolcezza.</p>
+			<p class="error" id="error"></p>
+		</form>
+
+		<section class="invite" id="invite">
+			<p>Ciao amore,</p>
+			<p>mi andava di fare una cosa carina per te, così eccola qui:</p>
+			<p><strong>Ti va di uscire con me questo weekend?</strong> 🌹</p>
+			<p>Prometto una serata fatta bene: posto carino, risate, e io che provo a fare il romantico (male ma con impegno).</p>
+			<p>Se accetti, scrivimi solo: <strong>"Sì, appuntamento confermato 💋"</strong></p>
+			<p style="margin-top:10px;">Con tutto il mio cuore,<br><strong>Il tuo ragazzo 💘</strong></p>
+		</section>
+	</main>
+
+	<script>
+		const PASSWORD_HASH = "394e6f94080bfb3cdff9359d440d5ce54168cac21449da48267b10ab545f7d7f";
+		const STORAGE_KEY = "invito_sbloccato";
+
+		const heartsContainer = document.getElementById("hearts");
+		const gate = document.getElementById("gate");
+		const passwordInput = document.getElementById("password");
+		const invite = document.getElementById("invite");
+		const error = document.getElementById("error");
+
+		function createHearts() {
+			for (let i = 0; i < 24; i++) {
+				const heart = document.createElement("span");
+				heart.className = "heart";
+				heart.textContent = "❤";
+				heart.style.left = `${Math.random() * 100}vw`;
+				heart.style.fontSize = `${12 + Math.random() * 18}px`;
+				heart.style.animationDuration = `${7 + Math.random() * 8}s`;
+				heart.style.animationDelay = `${Math.random() * 6}s`;
+				heartsContainer.appendChild(heart);
+			}
+		}
+
+		async function sha256(text) {
+			const buffer = new TextEncoder().encode(text);
+			const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+			const hashArray = Array.from(new Uint8Array(hashBuffer));
+			return hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("");
+		}
+
+		function unlock() {
+			gate.style.display = "none";
+			invite.classList.add("show");
+		}
+
+		gate.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			error.textContent = "";
+
+			const candidateHash = await sha256(passwordInput.value.trim());
+			if (candidateHash === PASSWORD_HASH) {
+				localStorage.setItem(STORAGE_KEY, "ok");
+				unlock();
+			} else {
+				error.textContent = "Password non corretta. Riprova 💫";
+			}
+		});
+
+		if (localStorage.getItem(STORAGE_KEY) === "ok") {
+			unlock();
+		}
+
+		createHearts();
+	</script>
+</body>
+</html>
+
