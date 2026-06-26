@@ -7,7 +7,7 @@ sitemap:
 ---
 
 <p align="center">
-    <img width="150%" src="{{ '/assets/img/frenk.heic' | prepend: site.baseurl }}" id="about-img"> 
+    <img width="150%" src="{{ '/assets/img/frenk-2.jpg' | prepend: site.baseurl }}" id="about-img"> 
     <p align="center"> <sup>Madrid, 2026</sup> <p align="center">
 </p>
 
