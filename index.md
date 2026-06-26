@@ -7,7 +7,7 @@ sitemap:
 ---
 
 <p align="center">
-    <img width="100%" src="{{ '/assets/img/frenk.jpg' | prepend: site.baseurl }}" id="about-img"> 
+    <img width="100%" src="{{ '/assets/img/frenk.heic' | prepend: site.baseurl }}" id="about-img"> 
     <p align="center"> <sup>Picture of me at the 6 hours of Imola, for the World Endurance Championship, April 2024.</sup> <p align="center">
 </p>
 
