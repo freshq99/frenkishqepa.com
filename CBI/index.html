@@ -265,10 +265,8 @@
             msgDiv.innerText = "Dato errato.";
             
             if(gifImg) {
-                // Patrick Jane GIF for first two wrong attempts, Red John smiley on the third
-                gifImg.src = (errors[riddleId] < 3)
-                    ? "https://media.giphy.com/media/3o7TKtnuHOHHUjR38Y/giphy.gif"
-                    : "https://upload.wikimedia.org/wikipedia/en/5/53/Red_John_smiley_face.jpg";
+                // Usa GIF locali nella cartella CBI. Prima/seconda sbagliata -> jane.gif; terza -> redjohn.gif
+                gifImg.src = (errors[riddleId] < 3) ? "CBI/jane.gif" : "CBI/redjohn.gif";
                 gifImg.style.display = "block";
             }
 
