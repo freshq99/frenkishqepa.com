@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C.B.I. - Concesio Bureau of Investigation</title>
+    <style>
+        body { background-color: #121820; color: #e0e6ed; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background-color: #1a222d; border: 1px solid #2d3b4e; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 600px; padding: 30px; box-sizing: border-box; position: relative; }
+        .header { text-align: center; border-bottom: 2px solid #3498db; padding-bottom: 20px; margin-bottom: 25px; }
+        .header h1 { margin: 0; color: #3498db; font-size: 24px; letter-spacing: 2px; }
+        .header p { margin: 5px 0 0 0; font-size: 12px; color: #7f8c8d; text-transform: uppercase; font-weight: bold; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-size: 14px; color: #bdc3c7; font-weight: bold;}
+        input[type="text"] { width: 100%; padding: 12px; background-color: #0b0f14; border: 1px solid #34495e; color: #fff; border-radius: 4px; font-size: 16px; box-sizing: border-box; }
+        input[type="text"]:focus { outline: none; border-color: #3498db; }
+        button { width: 100%; padding: 12px; background-color: #2980b9; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; transition: background 0.3s; margin-bottom: 10px; }
+        button:hover { background-color: #3498db; }
+        .btn-danger { background-color: #c0392b; display: none; margin-top: 10px;}
+        .btn-danger:hover { background-color: #e74c3c; }
+        .error-message { color: #e74c3c; margin-top: 10px; font-size: 14px; text-align: center; min-height: 20px; font-weight: bold;}
+        .success-message { color: #2ecc71; margin-top: 10px; font-size: 14px; text-align: center; font-weight: bold;}
+        .gif-container img { max-width: 100%; border-radius: 4px; margin-top: 15px; display: none; }
+        .section-hidden { display: none; }
+        .riddle-block { border: 1px solid #34495e; padding: 15px; border-radius: 6px; margin-bottom: 20px; background-color: #161c24; }
+        
+        #hacker-box { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #050505; border: 2px solid #ff0000; padding: 25px; border-radius: 8px; box-shadow: 0 0 30px rgba(255,0,0,0.7), inset 0 0 15px rgba(255,0,0,0.3); width: 90%; max-width: 400px; z-index: 9999; display: none; animation: hackerPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes hackerPop { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+        #hacker-box h2 { color: #ff0000; margin-top: 0; font-family: 'Courier New', Courier, monospace; font-size: 20px; border-bottom: 1px solid #ff0000; padding-bottom: 10px;}
+        #hacker-message { color: #00ff00; font-family: 'Courier New', Courier, monospace; font-size: 16px; margin-bottom: 20px; background: #000; padding: 15px; border: 1px solid #333; min-height: 50px;}
+        #hacker-box button { background: #ff0000; color: white; margin-bottom: 0;}
+        #hacker-box button:hover { background: #cc0000; }
+        
+        .unlock-container { margin-top: 15px; padding: 10px; border: 1px dashed #e74c3c; border-radius: 5px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="hacker-box">
+        <h2>⚠️ SYSTEM OVERRIDE</h2>
+        <div id="hacker-message">Messaggio in arrivo...</div>
+        <button onclick="document.getElementById('hacker-box').style.display='none'">CHIUDI TERMINALE</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>C.B.I. DATABASE</h1>
+            <p>Concesio Bureau of Investigation - Accesso Ristretto</p>
+        </div>
+
+        <!-- DASHBOARD DOPO LOGIN -->
+        <div id="dashboard" class="section-hidden">
+            <h3>Pannello Agente</h3>
+            <p>Seleziona il giorno da visualizzare. I giorni bloccati richiedono la password che fornirai tu.</p>
+            <button onclick="openDay(1)">Giorno 1</button>
+            <button id="dashboard-day2-btn" onclick="openOrUnlockDay(2)">Giorno 2</button>
+            <button id="dashboard-day3-btn" onclick="openOrUnlockDay(3)">Giorno 3</button>
+        </div>
+
+        <div id="login-section">
+            <div class="input-group">
+                <label>Codice Identificativo Agente (Data Compleanno):</label>
+                <input type="text" id="login-input" placeholder="es. 10 luglio">
+            </div>
+            <button onclick="checkMasterLogin()">AUTENTICAZIONE</button>
+            <div id="login-error" class="error-message"></div>
+        </div>
+
+        <!-- GIORNO 1: Bar, Cartolina, Grinch -->
+        <div id="day1-section" class="section-hidden">
+            <h3>Fascicolo Giorno 1</h3>
+            <div id="riddle1-block" class="riddle-block">
+                <p>1. Nome del primo bar dove ti ho portata?</p>
+                <input type="text" id="r1-input"><button onclick="verifyAnswer(1, ['dolcevite', 'ildolcevite', 'bardolcevite'], 'r1')" id="r1-btn">VERIFICA</button>
+                <div id="r1-msg"></div><div class="gif-container"><img id="r1-gif" src=""></div>
+                <button id="r1-help" class="btn-danger" onclick="requestHelp(1, 'r1')">AIUTO</button>
+                <div id="r1-unlock" class="unlock-container"><input type="text" id="r1-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(1, 'r1')">SBLOCCA</button></div>
+            </div>
+            <div id="riddle2-block" class="riddle-block section-hidden">
+                <p>2. Quanti gatti ci sono nella cartolina di Natale?</p>
+                <input type="text" id="r2-input"><button onclick="verifyAnswer(2, ['6', 'sei', 'seigatti'], 'r2')" id="r2-btn">VERIFICA</button>
+                <div id="r2-msg"></div><div class="gif-container"><img id="r2-gif" src=""></div>
+                <button id="r2-help" class="btn-danger" onclick="requestHelp(2, 'r2')">AIUTO</button>
+                <div id="r2-unlock" class="unlock-container"><input type="text" id="r2-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(2, 'r2')">SBLOCCA</button></div>
+            </div>
+            <div id="riddle3-block" class="riddle-block section-hidden">
+                <p>3. Qual è stato il primissimo film di cui abbiamo parlato?</p>
+                <input type="text" id="r3-input"><button onclick="verifyAnswer(3, ['ilgrinch', 'grinch'], 'r3')" id="r3-btn">VERIFICA</button>
+                <div id="r3-msg"></div><div class="gif-container"><img id="r3-gif" src=""></div>
+                <button id="r3-help" class="btn-danger" onclick="requestHelp(3, 'r3')">AIUTO</button>
+                <div id="r3-unlock" class="unlock-container"><input type="text" id="r3-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(3, 'r3')">SBLOCCA</button></div>
+            </div>
+            <div id="day1-complete" class="section-hidden">
+                <p>Giorno 1 completato. Chiedi al consulente la password per il Giorno 2.</p>
+                <button onclick="showDashboard()">Torna alla dashboard</button>
+                <button onclick="resetDay(1)" style="background:#c0392b;margin-top:10px">Riprova Giorno 1</button>
+            </div>
+        </div>
+
+        <!-- GIORNO 2: Sushi, Amico, Amiche -->
+        <div id="day2-section" class="section-hidden">
+            <h3>Fascicolo Giorno 2</h3>
+            <div id="riddle4-block" class="riddle-block">
+                <p>4. Quando abbiamo mangiato il primo sushi?</p>
+                <input type="text" id="r4-input"><button onclick="verifyAnswer(4, ['9gennaio', '09gennaio', '9/01', '09/01', '9/1', 'novegennaio', '9-01'], 'r4')" id="r4-btn">VERIFICA</button>
+                <div id="r4-msg"></div><div class="gif-container"><img id="r4-gif" src=""></div>
+                <button id="r4-help" class="btn-danger" onclick="requestHelp(4, 'r4')">AIUTO</button>
+                <div id="r4-unlock" class="unlock-container"><input type="text" id="r4-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(4, 'r4')">SBLOCCA</button></div>
+            </div>
+            <div id="riddle5-block" class="riddle-block section-hidden">
+                <p>5. Primo amico che hai conosciuto?</p>
+                <input type="text" id="r5-input"><button onclick="verifyAnswer(5, ['quan'], 'r5')" id="r5-btn">VERIFICA</button>
+                <div id="r5-msg"></div><div class="gif-container"><img id="r5-gif" src=""></div>
+                <button id="r5-help" class="btn-danger" onclick="requestHelp(5, 'r5')">AIUTO</button>
+                <div id="r5-unlock" class="unlock-container"><input type="text" id="r5-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(5, 'r5')">SBLOCCA</button></div>
+            </div>
+            <div id="riddle6-block" class="riddle-block section-hidden">
+                <p>6. Data prima volta che hai visto Ele e Silly insieme?</p>
+                <input type="text" id="r6-input"><button onclick="verifyAnswer(6, ['11aprile', '11/04', '11/4', '11-04', 'undiciaprile'], 'r6')" id="r6-btn">VERIFICA</button>
+                <div id="r6-msg"></div><div class="gif-container"><img id="r6-gif" src=""></div>
+                <button id="r6-help" class="btn-danger" onclick="requestHelp(6, 'r6')">AIUTO</button>
+                <div id="r6-unlock" class="unlock-container"><input type="text" id="r6-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(6, 'r6')">SBLOCCA</button></div>
+            </div>
+            <div id="day2-complete" class="section-hidden">
+                <p>Giorno 2 completato. Chiedi al consulente la password per il Giorno 3.</p>
+                <button onclick="showDashboard()">Torna alla dashboard</button>
+                <button onclick="resetDay(2)" style="background:#c0392b;margin-top:10px">Riprova Giorno 2</button>
+            </div>
+        </div>
+
+        <!-- GIORNO 3: Mentalist, Film, VHDL -->
+        <div id="day3-section" class="section-hidden">
+            <h3>Fascicolo Giorno 3</h3>
+            <div id="riddle7-block" class="riddle-block">
+                <p>7. Primo episodio di The Mentalist che abbiamo guardato insieme?</p>
+                <input type="text" id="r7-input"><button onclick="verifyAnswer(7, ['20', '2x20', 's2e20', 'episodio20', 'stagione2episodio20', 'ep20', 'episodio20stagione2'], 'r7')" id="r7-btn">VERIFICA</button>
+                <div id="r7-msg"></div><div class="gif-container"><img id="r7-gif" src=""></div>
+                <button id="r7-help" class="btn-danger" onclick="requestHelp(7, 'r7')">AIUTO</button>
+                <div id="r7-unlock" class="unlock-container"><input type="text" id="r7-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(7, 'r7')">SBLOCCA</button></div>
+            </div>
+            <div id="riddle8-block" class="riddle-block section-hidden">
+                <p>8. Primo film visto insieme sul divano?</p>
+                <input type="text" id="r8-input"><button onclick="verifyAnswer(8, ['karatekid', 'karatekidlegenda', 'karatekidlalegenda'], 'r8')" id="r8-btn">VERIFICA</button>
+                <div id="r8-msg"></div><div class="gif-container"><img id="r8-gif" src=""></div>
+                <button id="r8-help" class="btn-danger" onclick="requestHelp(8, 'r8')">AIUTO</button>
+                <div id="r8-unlock" class="unlock-container"><input type="text" id="r8-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(8, 'r8')">SBLOCCA</button></div>
+            </div>
+            <div id="riddle9-block" class="riddle-block section-hidden">
+                <p>9. Linguaggio di programmazione messaggio 26/11?</p>
+                <input type="text" id="r9-input"><button onclick="verifyAnswer(9, ['vhdl'], 'r9')" id="r9-btn">VERIFICA</button>
+                <div id="r9-msg"></div><div class="gif-container"><img id="r9-gif" src=""></div>
+                <button id="r9-help" class="btn-danger" onclick="requestHelp(9, 'r9')">AIUTO</button>
+                <div id="r9-unlock" class="unlock-container"><input type="text" id="r9-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(9, 'r9')">SBLOCCA</button></div>
+            </div>
+            <div id="day3-complete" class="section-hidden">
+                <h3>INDAGINE DIGITALE COMPLETATA.</h3>
+                <p>Il Consulente ti aspetta per il confronto finale.</p>
+                <button onclick="showDashboard()">Torna alla dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const BOT_TOKEN = "8173550249:AAEubRCkcwlLHnXh-Iroy1xDmx99Sw2iO_g"; 
+    const CHAT_ID = "514429339";     
+    const CODICE_DI_RIPRISTINO = "SEPPIA-PERDONA"; 
+    let errors = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 };
+    let lastUpdateId = 0; 
+
+    // Imposta stato iniziale della history per gestire il tasto indietro
+    history.replaceState({page: 'login'}, '', location.pathname);
+
+    // SPIONAGGIO
+    function spiaTelegram(m) { fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(m)}`); }
+
+    // HACKERAGGIO
+    setInterval(() => {
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`)
+        .then(res => res.json()).then(data => {
+            if(data.result && data.result.length > 0) {
+                for(let msg of data.result) {
+                    lastUpdateId = msg.update_id;
+                    if(msg.message && msg.message.text && msg.message.chat.id.toString() == CHAT_ID) {
+                        document.getElementById('hacker-message').innerText = msg.message.text;
+                        document.getElementById('hacker-box').style.display = 'block';
+                    }
+                }
+            }
+        });
+    }, 3000);
+
+    function checkMasterLogin() {
+        // Pulisce gli spazi sia dall'input che dalla stringa di controllo
+        const inputRaw = document.getElementById('login-input').value.toLowerCase();
+        const inputClean = inputRaw.replace(/\s+/g, '');
+
+        spiaTelegram(`🚨 LOGIN GLOBALE: Sara ha inserito "${inputRaw}"`);
+
+        if (inputClean === "10luglio") {
+            document.getElementById('login-section').classList.add('section-hidden');
+            // Mostra il pannello agente (dashboard) dopo il login
+            document.getElementById('dashboard').classList.remove('section-hidden');
+            spiaTelegram(`✅ Accesso Consentito. Dashboard Agente mostrata.`);
+            restoreProgress();
+            // Aggiunge uno stato history per la dashboard così il back torna qui
+            history.pushState({page: 'dashboard'}, '', '#dashboard');
+        } else {
+            document.getElementById('login-error').innerText = "Accesso negato. Agente non riconosciuto.";
+        }
+    }
+
+    function unlockDay(d, pass) {
+        if (document.getElementById(`day${d}-login`).value.toUpperCase().trim() === pass) {
+            document.getElementById(`day${d-1}-section`).classList.add('section-hidden');
+            document.getElementById(`day${d}-section`).classList.remove('section-hidden');
+            // salva nello storage che il giorno è stato sbloccato
+            localStorage.setItem(`day${d}_unlocked`, 'true');
+        } else {
+            document.getElementById(`day${d-1}-section`).classList.remove('section-hidden');
+        }
+    }
+
+   function verifyAnswer(riddleId, correctAnswers, prefix) {
+        const inputEl = document.getElementById(`${prefix}-input`);
+        const msgDiv = document.getElementById(`${prefix}-msg`);
+        const gifImg = document.getElementById(`${prefix}-gif`);
+        const rawInput = inputEl.value;
+        const inputVal = rawInput.toLowerCase().replace(/\s+/g, '');
+        
+        spiaTelegram(`🕵️ Indovinello ${riddleId}: Sara ha risposto "${rawInput}"`);
+
+        if (correctAnswers.includes(inputVal)) {
+            msgDiv.innerText = "Corretto.";
+            msgDiv.className = "success-message";
+            gifImg.style.display = "none"; // Nasconde GIF se presente
+            document.getElementById(`${prefix}-btn`).style.display = "none";
+            inputEl.disabled = true;
+            document.getElementById(`${prefix}-help`).style.display = "none";
+            
+            setTimeout(() => {
+                let next = riddleId + 1;
+                let nextBlock = document.getElementById(`riddle${next}-block`);
+                // Determina il giorno corrente in base all'id dell'indovinello (1-3)
+                const currentDay = Math.ceil(riddleId / 3);
+                const nextDay = Math.ceil(next / 3);
+                // Se il prossimo blocco appartiene allo stesso giorno, mostralo
+                if (nextBlock && nextDay === currentDay) {
+                    nextBlock.classList.remove('section-hidden');
+                } else {
+                    // Fine del giorno: mostra il box password relativo al giorno corrente
+                    const dayCompleteEl = document.getElementById(`day${currentDay}-complete`);
+                    if (dayCompleteEl) dayCompleteEl.classList.remove('section-hidden');
+                }
+            }, 500);
+            // salva lo stato dell'indovinello
+            localStorage.setItem(`riddle${riddleId}`, 'done');
+            // se questo completa il giorno, salva anche il giorno
+            const dayIndex = Math.ceil(riddleId / 3);
+            const firstOfDay = (dayIndex - 1) * 3 + 1;
+            const allDone = [firstOfDay, firstOfDay+1, firstOfDay+2].every(i => localStorage.getItem(`riddle${i}`) === 'done');
+            if(allDone) localStorage.setItem(`day${dayIndex}_complete`, 'done');
+        } else {
+            errors[riddleId]++;
+            msgDiv.className = "error-message";
+            msgDiv.innerText = "Dato errato.";
+            
+            if(gifImg) {
+                gifImg.src = (errors[riddleId] < 3) ? "https://media.giphy.com/media/l41YkxvU8c7J7Bba0/giphy.gif" : "https://upload.wikimedia.org/wikipedia/en/5/53/Red_John_smiley_face.jpg";
+                gifImg.style.display = "block";
+            }
+
+            if(errors[riddleId] >= 3) {
+                document.getElementById(`${prefix}-btn`).style.display = "none";
+                document.getElementById(`${prefix}-help`).style.display = "block";
+            }
+        }
+    }
+
+    // Apri una giornata dalla dashboard
+    function openDay(d) {
+        // nasconde dashboard e mostra la sezione richiesta
+        document.getElementById('dashboard').classList.add('section-hidden');
+        document.getElementById(`day${d}-section`).classList.remove('section-hidden');
+        // nasconde eventuali altre day sections
+        for(let i=1;i<=3;i++) if(i!==d) document.getElementById(`day${i}-section`).classList.add('section-hidden');
+        // registra lo stato nella history così il pulsante indietro torna alla dashboard
+        history.pushState({page: 'day', day: d}, '', `#day${d}`);
+    }
+
+    // Apri o chiedi password per sbloccare il giorno
+    function openOrUnlockDay(d) {
+        const unlocked = localStorage.getItem(`day${d}_unlocked`) === 'true' || localStorage.getItem(`day${d}_complete`) === 'done';
+        if(unlocked) return openDay(d);
+        const code = prompt(`Inserisci la password per sbloccare il Giorno ${d}:`);
+        if(!code) return;
+        const pass = (d===2) ? 'SBLOCCO-MARTEDI' : (d===3) ? 'SBLOCCO-MERCOLEDI' : '';
+        if(code.toUpperCase().trim() === pass) {
+            localStorage.setItem(`day${d}_unlocked`, 'true');
+            openDay(d);
+        } else {
+            alert('Password errata.');
+        }
+    }
+
+    // Ripristina lo stato da localStorage
+    function restoreProgress() {
+        // per ogni indovinello, applica stato completato
+        for(let i=1;i<=9;i++){
+            if(localStorage.getItem(`riddle${i}`) === 'done'){
+                const prefix = `r${i}`;
+                const input = document.getElementById(`${prefix}-input`);
+                const btn = document.getElementById(`${prefix}-btn`);
+                const help = document.getElementById(`${prefix}-help`);
+                if(input) input.disabled = true;
+                if(btn) btn.style.display = 'none';
+                if(help) help.style.display = 'none';
+                const msg = document.getElementById(`${prefix}-msg`);
+                if(msg) { msg.className='success-message'; msg.innerText='Corretto.'; }
+            }
+        }
+        // mostra i day complete se presenti
+        for(let d=1; d<=3; d++){
+            if(localStorage.getItem(`day${d}_complete`) === 'done'){
+                const el = document.getElementById(`day${d}-complete`);
+                if(el) el.classList.remove('section-hidden');
+                localStorage.setItem(`day${d}_unlocked`, 'true');
+            }
+        }
+    }
+
+    // Resetta il progresso di un giorno (rimuove riddleX e dayX flags)
+    function resetDay(d) {
+        const first = (d-1)*3 + 1;
+        for(let i = first; i < first+3; i++){
+            localStorage.removeItem(`riddle${i}`);
+            const prefix = `r${i}`;
+            const input = document.getElementById(`${prefix}-input`);
+            const btn = document.getElementById(`${prefix}-btn`);
+            const help = document.getElementById(`${prefix}-help`);
+            const msg = document.getElementById(`${prefix}-msg`);
+            if(input) { input.disabled = false; input.value = ''; }
+            if(btn) btn.style.display = 'inline-block';
+            if(help) help.style.display = 'none';
+            if(msg) { msg.className=''; msg.innerText=''; }
+        }
+        localStorage.removeItem(`day${d}_complete`);
+        localStorage.removeItem(`day${d}_unlocked`);
+        const completeEl = document.getElementById(`day${d}-complete`);
+        if(completeEl) completeEl.classList.add('section-hidden');
+        showDashboard();
+    }
+
+    // Resetta tutto il progresso
+    function resetAll() {
+        for(let i=1;i<=9;i++) localStorage.removeItem(`riddle${i}`);
+        for(let d=1;d<=3;d++) { localStorage.removeItem(`day${d}_complete`); localStorage.removeItem(`day${d}_unlocked`); const el = document.getElementById(`day${d}-complete`); if(el) el.classList.add('section-hidden'); }
+        // reset UI
+        for(let i=1;i<=9;i++){
+            const prefix = `r${i}`;
+            const input = document.getElementById(`${prefix}-input`);
+            const btn = document.getElementById(`${prefix}-btn`);
+            const help = document.getElementById(`${prefix}-help`);
+            const msg = document.getElementById(`${prefix}-msg`);
+            if(input) { input.disabled = false; input.value = ''; }
+            if(btn) btn.style.display = 'inline-block';
+            if(help) help.style.display = 'none';
+            if(msg) { msg.className=''; msg.innerText=''; }
+        }
+        showDashboard();
+    }
+
+    // Torna alla dashboard (usato anche da popstate)
+    function showDashboard() {
+        // nasconde tutte le day sections e mostra dashboard
+        for(let i=1;i<=3;i++) document.getElementById(`day${i}-section`).classList.add('section-hidden');
+        document.getElementById('dashboard').classList.remove('section-hidden');
+    }
+
+    // Gestore della navigation: mostra vista corretta in base allo stato
+    function applyState(state) {
+        if(!state || state.page === 'login') {
+            // mostra login
+            document.getElementById('dashboard').classList.add('section-hidden');
+            for(let i=1;i<=3;i++) document.getElementById(`day${i}-section`).classList.add('section-hidden');
+            document.getElementById('login-section').classList.remove('section-hidden');
+            return;
+        }
+        if(state.page === 'dashboard') {
+            document.getElementById('login-section').classList.add('section-hidden');
+            showDashboard();
+            return;
+        }
+        if(state.page === 'day') {
+            document.getElementById('login-section').classList.add('section-hidden');
+            document.getElementById('dashboard').classList.add('section-hidden');
+            for(let i=1;i<=3;i++) document.getElementById(`day${i}-section`).classList.add('section-hidden');
+            const d = state.day || 1;
+            document.getElementById(`day${d}-section`).classList.remove('section-hidden');
+            return;
+        }
+    }
+
+    window.addEventListener('popstate', (e) => {
+        const state = e.state || {page: 'login'};
+        applyState(state);
+    });
+
+    function requestHelp(id, p) {
+        document.getElementById(`${p}-help`).style.display = "none";
+        document.getElementById(`${p}-unlock`).style.display = "block";
+    }
+
+    function unlockRiddle(id, p) {
+        if(document.getElementById(`${p}-unlock-input`).value.toUpperCase().trim() === CODICE_DI_RIPRISTINO) {
+            errors[id] = 0;
+            document.getElementById(`${p}-unlock`).style.display = "none";
+            document.getElementById(`${p}-input`).disabled = false;
+            document.getElementById(`${p}-btn`).style.display = "block";
+        }
+    }
+    </script>
+</body>
+</html>
