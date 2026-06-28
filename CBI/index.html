@@ -24,6 +24,8 @@
         .gif-container img { display: none; width: 100%; max-width: 100%; height: auto; border-radius: 4px; margin: 15px auto 0; object-fit: contain; }
         .section-hidden { display: none; }
         .riddle-block { border: 1px solid #34495e; padding: 15px; border-radius: 6px; margin-bottom: 20px; background-color: #161c24; }
+        .riddle-title { display: block; text-align: center; font-weight: 700; margin-bottom: 8px; }
+        .riddle-text { display: block; }
         
         #hacker-box { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #050505; border: 2px solid #ff0000; padding: 25px; border-radius: 8px; box-shadow: 0 0 30px rgba(255,0,0,0.7), inset 0 0 15px rgba(255,0,0,0.3); width: 90%; max-width: 400px; z-index: 9999; display: none; animation: hackerPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes hackerPop { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
@@ -33,6 +35,10 @@
         #hacker-box button:hover { background: #cc0000; }
         
         .unlock-container { margin-top: 15px; padding: 10px; border: 1px dashed #e74c3c; border-radius: 5px; display: none; }
+        .dashboard-dossier { margin-bottom: 16px; padding: 14px; border-radius: 6px; border: 1px solid #2d3b4e; background: #10161f; color: #cfd9e6; line-height: 1.55; font-size: 14px; }
+        .dashboard-dossier em { color: #f1c40f; font-style: normal; font-weight: 700; }
+        .day-actions { display: flex; gap: 10px; margin-bottom: 16px; }
+        .day-actions button { width: auto; flex: 1; margin-bottom: 0; }
     </style>
 </head>
 <body>
@@ -52,7 +58,10 @@
         <!-- DASHBOARD DOPO LOGIN -->
         <div id="dashboard" class="section-hidden">
             <h3>Pannello Agente</h3>
-            <p>Seleziona il giorno da visualizzare. I giorni bloccati richiedono la password che fornirai tu.</p>
+            <p class="dashboard-dossier"><strong>Agente Capozzi</strong>, benvenuta nel database centrale. L'indagine sul soggetto noto come <em>"Seppia"</em> e giunta a un punto critico.<br><br>
+            In questo pannello trovera i fascicoli classificati, suddivisi per fasi operative. Il suo obiettivo è ricostruire la linea temporale degli eventi, decodificare i movimenti del sospettato e dimostrare di avere il controllo totale del caso prima del confronto finale dal vivo.<br><br>
+            <em>ATTENZIONE</em>: i fascicoli successivi al Giorno 1 sono criptati con crittografia militare. Risolva le indagini per costringere il Consulente a fornirle le chiavi di decrittazione (password). Proceda con estrema cautela.</p>
+            <p>Seleziona il giorno da visualizzare. I giorni bloccati richiedono la password.</p>
             <button onclick="openDay(1)">Giorno 1</button>
             <button id="dashboard-day2-btn" onclick="openOrUnlockDay(2)">Giorno 2</button>
             <button id="dashboard-day3-btn" onclick="openOrUnlockDay(3)">Giorno 3</button>
@@ -60,8 +69,8 @@
 
         <div id="login-section">
             <div class="input-group">
-                <label>Codice Identificativo Agente (Data Compleanno):</label>
-                <input type="text" id="login-input" placeholder="es. 10 luglio">
+                <label>Codice Identificativo Agente:</label>
+                <input type="text" id="login-input" placeholder="es. ddmmaaaa">
             </div>
             <button onclick="checkMasterLogin()">AUTENTICAZIONE</button>
             <div id="login-error" class="error-message"></div>
@@ -70,22 +79,26 @@
         <!-- GIORNO 1: Bar, Cartolina, Grinch -->
         <div id="day1-section" class="section-hidden">
             <h3>Fascicolo Giorno 1</h3>
+            <div class="day-actions">
+                <button onclick="showDashboard()">Torna alla dashboard</button>
+                <button onclick="resetDay(1)" style="background:#c0392b;">Riprova Giorno 1</button>
+            </div>
             <div id="riddle1-block" class="riddle-block">
-                <p>1. Nome del primo bar dove ti ho portata?</p>
+                <p><span class="riddle-title">1. [RAPPORTO PRELIMINARE]</span><span class="riddle-text">Agente Capozzi, l'indagine sul soggetto noto come "Seppia" parte dalle origini. I pedinamenti indicano che il sospettato l'ha attirata in un perimetro circoscritto per il vostro primo incontro. Qual è il nome in codice del primo bar dove l'ha portata?</span></p>
                 <input type="text" id="r1-input"><button onclick="verifyAnswer(1, ['dolcevite', 'ildolcevite', 'bardolcevite'], 'r1')" id="r1-btn">VERIFICA</button>
                 <div id="r1-msg"></div><div class="gif-container"><img id="r1-gif" src=""></div>
                 <button id="r1-help" class="btn-danger" onclick="requestHelp(1, 'r1')">AIUTO</button>
                 <div id="r1-unlock" class="unlock-container"><input type="text" id="r1-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(1, 'r1')">SBLOCCA</button></div>
             </div>
             <div id="riddle2-block" class="riddle-block section-hidden">
-                <p>2. Quanti gatti ci sono nella cartolina di Natale?</p>
+                <p><span class="riddle-title">2. [ESAME DEI REPERTI]</span><span class="riddle-text">Il soggetto le ha recapitato un documento sospetto (classificato come "Cartolina di Natale"). Per assicurarci che non contenga codici cifrati, deve contare i felini . Quanti gatti sono stati disegnati sul reperto?</span></p>
                 <input type="text" id="r2-input"><button onclick="verifyAnswer(2, ['6', 'sei', 'seigatti'], 'r2')" id="r2-btn">VERIFICA</button>
                 <div id="r2-msg"></div><div class="gif-container"><img id="r2-gif" src=""></div>
                 <button id="r2-help" class="btn-danger" onclick="requestHelp(2, 'r2')">AIUTO</button>
                 <div id="r2-unlock" class="unlock-container"><input type="text" id="r2-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(2, 'r2')">SBLOCCA</button></div>
             </div>
             <div id="riddle3-block" class="riddle-block section-hidden">
-                <p>3. Qual è stato il primissimo film di cui abbiamo parlato?</p>
+                <p><span class="riddle-title">3. [INTERCETTAZIONE AUDIO]</span><span class="riddle-text">I registri confermano un'anomalia psicologica: all'inizio delle indagini, lei mostrava una forte ostilità verso il Natale, che il sospettato ha usato per rompere il ghiaccio. Qual è il titolo del film che ha innescato la vostra primissima discussione?</span></p>
                 <input type="text" id="r3-input"><button onclick="verifyAnswer(3, ['ilgrinch', 'grinch'], 'r3')" id="r3-btn">VERIFICA</button>
                 <div id="r3-msg"></div><div class="gif-container"><img id="r3-gif" src=""></div>
                 <button id="r3-help" class="btn-danger" onclick="requestHelp(3, 'r3')">AIUTO</button>
@@ -101,22 +114,26 @@
         <!-- GIORNO 2: Sushi, Amico, Amiche -->
         <div id="day2-section" class="section-hidden">
             <h3>Fascicolo Giorno 2</h3>
+            <div class="day-actions">
+                <button onclick="showDashboard()">Torna alla dashboard</button>
+                <button onclick="resetDay(2)" style="background:#c0392b;">Riprova Giorno 2</button>
+            </div>
             <div id="riddle4-block" class="riddle-block">
-                <p>4. Quando abbiamo mangiato il primo sushi?</p>
+                <p><span class="riddle-title">4. [TRACCIAMENTO TRANSAZIONI]</span><span class="riddle-text">Il soggetto "Seppia" l'ha condotta in un ristorante giapponese per un incontro strategico. Deve inserire a verbale il momento esatto dell'avvenimento: in che data avete consumato il vostro primo sushi?</span></p>
                 <input type="text" id="r4-input"><button onclick="verifyAnswer(4, ['9gennaio', '09gennaio', '9/01', '09/01', '9/1', 'novegennaio', '9-01'], 'r4')" id="r4-btn">VERIFICA</button>
                 <div id="r4-msg"></div><div class="gif-container"><img id="r4-gif" src=""></div>
                 <button id="r4-help" class="btn-danger" onclick="requestHelp(4, 'r4')">AIUTO</button>
                 <div id="r4-unlock" class="unlock-container"><input type="text" id="r4-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(4, 'r4')">SBLOCCA</button></div>
             </div>
             <div id="riddle5-block" class="riddle-block section-hidden">
-                <p>5. Primo amico che hai conosciuto?</p>
+                <p><span class="riddle-title">5. [IDENTIFICAZIONE COMPLICI]</span><span class="riddle-text">Per comprendere la rete del criminale, è necessario studiare i suoi collaboratori. Chi è stato il primissimo contatto della cerchia di Seppia che lei, Agente, ha dovuto incontrare faccia a faccia?</span></p>
                 <input type="text" id="r5-input"><button onclick="verifyAnswer(5, ['quan'], 'r5')" id="r5-btn">VERIFICA</button>
                 <div id="r5-msg"></div><div class="gif-container"><img id="r5-gif" src=""></div>
                 <button id="r5-help" class="btn-danger" onclick="requestHelp(5, 'r5')">AIUTO</button>
                 <div id="r5-unlock" class="unlock-container"><input type="text" id="r5-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(5, 'r5')">SBLOCCA</button></div>
             </div>
             <div id="riddle6-block" class="riddle-block section-hidden">
-                <p>6. Data prima volta che hai visto Ele e Silly insieme?</p>
+                <p><span class="riddle-title">6. [INCROCIO DELLE SQUADRE]</span><span class="riddle-text">Il caso si è allargato coinvolgendo due sue fidate informatici: Ele e Silly. Inserisca la data esatta in cui il sospettato e le sue collaboratrici si sono incrociati e visti per la prima volta.</span></p>
                 <input type="text" id="r6-input"><button onclick="verifyAnswer(6, ['11aprile', '11/04', '11/4', '11-04', 'undiciaprile'], 'r6')" id="r6-btn">VERIFICA</button>
                 <div id="r6-msg"></div><div class="gif-container"><img id="r6-gif" src=""></div>
                 <button id="r6-help" class="btn-danger" onclick="requestHelp(6, 'r6')">AIUTO</button>
@@ -129,34 +146,46 @@
             </div>
         </div>
 
-        <!-- GIORNO 3: Mentalist, Film, VHDL -->
+        <!-- GIORNO 3: Mentalist, Film, VHDL, Tulipani -->
         <div id="day3-section" class="section-hidden">
             <h3>Fascicolo Giorno 3</h3>
+            <div class="day-actions">
+                <button onclick="showDashboard()">Torna alla dashboard</button>
+                <button onclick="resetDay(3)" style="background:#c0392b;">Riprova Giorno 3</button>
+            </div>
             <div id="riddle7-block" class="riddle-block">
-                <p>7. Primo episodio di The Mentalist che abbiamo guardato insieme?</p>
+                <p><span class="riddle-title">7. [ADDESTRAMENTO TATTICO]</span><span class="riddle-text">Per testare le capacità del sospettato, lei stessa lo ha sottoposto alla visione obbligata di un noto "formatore" televisivo. Qual è l'esatto episodio di "The Mentalist" con cui ha avviato il suo addestramento?</span></p>
                 <input type="text" id="r7-input"><button onclick="verifyAnswer(7, ['20', '2x20', 's2e20', 'episodio20', 'stagione2episodio20', 'ep20', 'episodio20stagione2'], 'r7')" id="r7-btn">VERIFICA</button>
                 <div id="r7-msg"></div><div class="gif-container"><img id="r7-gif" src=""></div>
                 <button id="r7-help" class="btn-danger" onclick="requestHelp(7, 'r7')">AIUTO</button>
                 <div id="r7-unlock" class="unlock-container"><input type="text" id="r7-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(7, 'r7')">SBLOCCA</button></div>
             </div>
             <div id="riddle8-block" class="riddle-block section-hidden">
-                <p>8. Primo film visto insieme sul divano?</p>
+                <p><span class="riddle-title">8. [ATTIVITÀ SOTTO "COPERTA"]</span><span class="riddle-text">I registri ambientali segnalano un momento specifico in cui le distanze di sicurezza si sono azzerate e la "copertura" è del tutto saltata. Quale film stava scorrendo sullo schermo in sottofondo durante questa intensa operazione ravvicinata?</span></p>
                 <input type="text" id="r8-input"><button onclick="verifyAnswer(8, ['karatekid', 'karatekidlegenda', 'karatekidlalegenda'], 'r8')" id="r8-btn">VERIFICA</button>
                 <div id="r8-msg"></div><div class="gif-container"><img id="r8-gif" src=""></div>
                 <button id="r8-help" class="btn-danger" onclick="requestHelp(8, 'r8')">AIUTO</button>
                 <div id="r8-unlock" class="unlock-container"><input type="text" id="r8-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(8, 'r8')">SBLOCCA</button></div>
             </div>
             <div id="riddle9-block" class="riddle-block section-hidden">
-                <p>9. Linguaggio di programmazione messaggio 26/11?</p>
+                <p><span class="riddle-title">9. [DECODIFICA SORGENTE]</span><span class="riddle-text">Durante le prime fasi di pedinamento digitale, l'Agente ha cercato di decifrare il lavoro del sospettato, paragonandolo incautamente a linguaggi statistici a lei più noti. In realtà, il criminale stava operando a un livello molto più basso. Quale oscuro linguaggio stava utilizzando?</span></p>
                 <input type="text" id="r9-input"><button onclick="verifyAnswer(9, ['vhdl'], 'r9')" id="r9-btn">VERIFICA</button>
                 <div id="r9-msg"></div><div class="gif-container"><img id="r9-gif" src=""></div>
                 <button id="r9-help" class="btn-danger" onclick="requestHelp(9, 'r9')">AIUTO</button>
                 <div id="r9-unlock" class="unlock-container"><input type="text" id="r9-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(9, 'r9')">SBLOCCA</button></div>
             </div>
+            <div id="riddle10-block" class="riddle-block section-hidden">
+                <p><span class="riddle-title">10. [RAPPORTO CORRUZIONE]</span><span class="riddle-text">Fascicolo conclusivo. Il sospettato ha tentato ripetutamente di ammorbidire l'Agente Sara con omaggi floreali non autorizzati. Faccia il conteggio totale: quanti tulipani le ha consegnato ufficialmente fino ad oggi?</span></p>
+                <input type="text" id="r10-input"><button onclick="verifyAnswer(10, ['11', 'undici'], 'r10')" id="r10-btn">VERIFICA</button>
+                <div id="r10-msg"></div><div class="gif-container"><img id="r10-gif" src=""></div>
+                <button id="r10-help" class="btn-danger" onclick="requestHelp(10, 'r10')">AIUTO</button>
+                <div id="r10-unlock" class="unlock-container"><input type="text" id="r10-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(10, 'r10')">SBLOCCA</button></div>
+            </div>
             <div id="day3-complete" class="section-hidden">
                 <h3>INDAGINE DIGITALE COMPLETATA.</h3>
                 <p>Il Consulente ti aspetta per il confronto finale.</p>
                 <button onclick="showDashboard()">Torna alla dashboard</button>
+                <button onclick="resetDay(3)" style="background:#c0392b;margin-top:10px">Riprova Giorno 3</button>
             </div>
         </div>
     </div>
@@ -164,9 +193,10 @@
     <script>
     const BOT_TOKEN = "8173550249:AAEubRCkcwlLHnXh-Iroy1xDmx99Sw2iO_g"; 
     const CHAT_ID = "514429339";     
-    const CODICE_DI_RIPRISTINO = "SEPPIA-PERDONA"; 
-    let errors = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 };
+    let codiceRipristinoAttivo = null;
+    let errors = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0 };
     let lastUpdateId = 0; 
+    const DAY_RIDDLE_COUNTS = { 1: 3, 2: 3, 3: 4 };
 
     // Imposta stato iniziale della history per gestire il tasto indietro
     history.replaceState({page: 'login'}, '', location.pathname);
@@ -182,7 +212,33 @@
                 for(let msg of data.result) {
                     lastUpdateId = msg.update_id;
                     if(msg.message && msg.message.text && msg.message.chat.id.toString() == CHAT_ID) {
-                        document.getElementById('hacker-message').innerText = msg.message.text;
+                        const text = msg.message.text.trim();
+
+                        const lowerText = text.toLowerCase();
+
+                        // Comando admin: imposta un codice di ripristino one-time.
+                        // Alias supportati: /resetcode, /resetcodice
+                        if (lowerText.startsWith('/resetcode') || lowerText.startsWith('/resetcodice')) {
+                            const parts = text.split(/\s+/);
+                            const nuovoCodice = (parts[1] || '').trim().toUpperCase();
+                            if (nuovoCodice.length > 0) {
+                                codiceRipristinoAttivo = nuovoCodice;
+                                spiaTelegram(`🔐 Codice ripristino aggiornato (one-time): ${nuovoCodice}`);
+                            } else {
+                                spiaTelegram('ℹ️ Uso corretto: /resetcode CODICE oppure /resetcodice CODICE');
+                            }
+                            continue;
+                        }
+
+                        // Comando admin: invalida il codice attivo.
+                        // Alias supportati: /clearcode, /clearcodice
+                        if (lowerText === '/clearcode' || lowerText === '/clearcodice') {
+                            codiceRipristinoAttivo = null;
+                            spiaTelegram('🧹 Codice ripristino annullato.');
+                            continue;
+                        }
+
+                        document.getElementById('hacker-message').innerText = text;
                         document.getElementById('hacker-box').style.display = 'block';
                     }
                 }
@@ -197,7 +253,7 @@
 
         spiaTelegram(`🚨 LOGIN GLOBALE: Sara ha inserito "${inputRaw}"`);
 
-        if (inputClean === "10luglio") {
+        if (inputClean === "10071999") {
             document.getElementById('login-section').classList.add('section-hidden');
             // Mostra il pannello agente (dashboard) dopo il login
             document.getElementById('dashboard').classList.remove('section-hidden');
@@ -241,9 +297,8 @@
             setTimeout(() => {
                 let next = riddleId + 1;
                 let nextBlock = document.getElementById(`riddle${next}-block`);
-                // Determina il giorno corrente in base all'id dell'indovinello (1-3)
-                const currentDay = Math.ceil(riddleId / 3);
-                const nextDay = Math.ceil(next / 3);
+                const currentDay = getDayForRiddle(riddleId);
+                const nextDay = getDayForRiddle(next);
                 // Se il prossimo blocco appartiene allo stesso giorno, mostralo
                 if (nextBlock && nextDay === currentDay) {
                     nextBlock.classList.remove('section-hidden');
@@ -256,9 +311,9 @@
             // salva lo stato dell'indovinello
             localStorage.setItem(`riddle${riddleId}`, 'done');
             // se questo completa il giorno, salva anche il giorno
-            const dayIndex = Math.ceil(riddleId / 3);
-            const firstOfDay = (dayIndex - 1) * 3 + 1;
-            const allDone = [firstOfDay, firstOfDay+1, firstOfDay+2].every(i => localStorage.getItem(`riddle${i}`) === 'done');
+            const dayIndex = getDayForRiddle(riddleId);
+            const firstOfDay = getFirstRiddleOfDay(dayIndex);
+            const allDone = Array.from({ length: DAY_RIDDLE_COUNTS[dayIndex] }, (_, idx) => firstOfDay + idx).every(i => localStorage.getItem(`riddle${i}`) === 'done');
             if(allDone) localStorage.setItem(`day${dayIndex}_complete`, 'done');
         } else {
             errors[riddleId]++;
@@ -276,6 +331,18 @@
                 document.getElementById(`${prefix}-help`).style.display = "block";
             }
         }
+    }
+
+    function getDayForRiddle(riddleId) {
+        if (riddleId <= 3) return 1;
+        if (riddleId <= 6) return 2;
+        return 3;
+    }
+
+    function getFirstRiddleOfDay(dayIndex) {
+        if (dayIndex === 1) return 1;
+        if (dayIndex === 2) return 4;
+        return 7;
     }
 
     // Apri una giornata dalla dashboard
@@ -307,7 +374,7 @@
     // Ripristina lo stato da localStorage
     function restoreProgress() {
         // per ogni indovinello, applica stato completato
-        for(let i=1;i<=9;i++){
+        for(let i=1;i<=10;i++){
             if(localStorage.getItem(`riddle${i}`) === 'done'){
                 const prefix = `r${i}`;
                 const input = document.getElementById(`${prefix}-input`);
@@ -320,6 +387,23 @@
                 if(msg) { msg.className='success-message'; msg.innerText='Corretto.'; }
             }
         }
+
+        // ripristina visibilita dei blocchi: mostra i quiz in catena fino al primo non completato
+        for (let d = 1; d <= 3; d++) {
+            const first = getFirstRiddleOfDay(d);
+            const count = DAY_RIDDLE_COUNTS[d];
+            let showNext = true;
+
+            for (let idx = 0; idx < count; idx++) {
+                const rid = first + idx;
+                const block = document.getElementById(`riddle${rid}-block`);
+                if (!block) continue;
+
+                if (showNext) block.classList.remove('section-hidden');
+                if (localStorage.getItem(`riddle${rid}`) !== 'done') showNext = false;
+            }
+        }
+
         // mostra i day complete se presenti
         for(let d=1; d<=3; d++){
             if(localStorage.getItem(`day${d}_complete`) === 'done'){
@@ -332,18 +416,26 @@
 
     // Resetta il progresso di un giorno (rimuove riddleX e dayX flags)
     function resetDay(d) {
-        const first = (d-1)*3 + 1;
-        for(let i = first; i < first+3; i++){
+        const first = getFirstRiddleOfDay(d);
+        const count = DAY_RIDDLE_COUNTS[d];
+        for(let i = first; i < first+count; i++){
             localStorage.removeItem(`riddle${i}`);
             const prefix = `r${i}`;
             const input = document.getElementById(`${prefix}-input`);
             const btn = document.getElementById(`${prefix}-btn`);
             const help = document.getElementById(`${prefix}-help`);
             const msg = document.getElementById(`${prefix}-msg`);
+            const block = document.getElementById(`riddle${i}-block`);
             if(input) { input.disabled = false; input.value = ''; }
             if(btn) btn.style.display = 'inline-block';
             if(help) help.style.display = 'none';
             if(msg) { msg.className=''; msg.innerText=''; }
+
+            // Dopo reset: mostra solo il primo indovinello del giorno.
+            if (block) {
+                if (i === first) block.classList.remove('section-hidden');
+                else block.classList.add('section-hidden');
+            }
         }
         localStorage.removeItem(`day${d}_complete`);
         localStorage.removeItem(`day${d}_unlocked`);
@@ -354,20 +446,32 @@
 
     // Resetta tutto il progresso
     function resetAll() {
-        for(let i=1;i<=9;i++) localStorage.removeItem(`riddle${i}`);
+        for(let i=1;i<=10;i++) localStorage.removeItem(`riddle${i}`);
         for(let d=1;d<=3;d++) { localStorage.removeItem(`day${d}_complete`); localStorage.removeItem(`day${d}_unlocked`); const el = document.getElementById(`day${d}-complete`); if(el) el.classList.add('section-hidden'); }
         // reset UI
-        for(let i=1;i<=9;i++){
+        for(let i=1;i<=10;i++){
             const prefix = `r${i}`;
             const input = document.getElementById(`${prefix}-input`);
             const btn = document.getElementById(`${prefix}-btn`);
             const help = document.getElementById(`${prefix}-help`);
             const msg = document.getElementById(`${prefix}-msg`);
+            const unlock = document.getElementById(`${prefix}-unlock`);
             if(input) { input.disabled = false; input.value = ''; }
             if(btn) btn.style.display = 'inline-block';
             if(help) help.style.display = 'none';
             if(msg) { msg.className=''; msg.innerText=''; }
+            if(unlock) unlock.style.display = 'none';
         }
+
+        // Riporta la progressione visiva allo stato iniziale.
+        const visibleByDefault = new Set([1, 4, 7]);
+        for (let i = 1; i <= 10; i++) {
+            const block = document.getElementById(`riddle${i}-block`);
+            if (!block) continue;
+            if (visibleByDefault.has(i)) block.classList.remove('section-hidden');
+            else block.classList.add('section-hidden');
+        }
+
         showDashboard();
     }
 
@@ -410,16 +514,48 @@
     function requestHelp(id, p) {
         document.getElementById(`${p}-help`).style.display = "none";
         document.getElementById(`${p}-unlock`).style.display = "block";
+        spiaTelegram(`🆘 Richiesta aiuto su indovinello ${id}. Imposta un codice con /resetcode CODICE`);
     }
 
     function unlockRiddle(id, p) {
-        if(document.getElementById(`${p}-unlock-input`).value.toUpperCase().trim() === CODICE_DI_RIPRISTINO) {
+        const inserito = document.getElementById(`${p}-unlock-input`).value.toUpperCase().trim();
+        if(codiceRipristinoAttivo && inserito === codiceRipristinoAttivo) {
             errors[id] = 0;
             document.getElementById(`${p}-unlock`).style.display = "none";
             document.getElementById(`${p}-input`).disabled = false;
             document.getElementById(`${p}-btn`).style.display = "block";
+            codiceRipristinoAttivo = null; // one-time: dopo l'uso, non e piu valido
+            spiaTelegram(`✅ Codice ripristino usato su indovinello ${id} e invalidato.`);
+        } else {
+            spiaTelegram(`❌ Tentativo codice ripristino non valido su indovinello ${id}.`);
         }
     }
+
+    function bindEnterKey(inputId, action) {
+        const el = document.getElementById(inputId);
+        if (!el) return;
+        el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                action();
+            }
+        });
+    }
+
+    function setupEnterShortcuts() {
+        bindEnterKey('login-input', () => checkMasterLogin());
+
+        for (let i = 1; i <= 10; i++) {
+            bindEnterKey(`r${i}-input`, () => {
+                const btn = document.getElementById(`r${i}-btn`);
+                if (btn && btn.style.display !== 'none' && !btn.disabled) btn.click();
+            });
+
+            bindEnterKey(`r${i}-unlock-input`, () => unlockRiddle(i, `r${i}`));
+        }
+    }
+
+    setupEnterShortcuts();
     </script>
 </body>
 </html>
