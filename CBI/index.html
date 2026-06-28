@@ -265,7 +265,10 @@
             msgDiv.innerText = "Dato errato.";
             
             if(gifImg) {
-                gifImg.src = (errors[riddleId] < 3) ? "https://media.giphy.com/media/l41YkxvU8c7J7Bba0/giphy.gif" : "https://upload.wikimedia.org/wikipedia/en/5/53/Red_John_smiley_face.jpg";
+                // Patrick Jane GIF for first two wrong attempts, Red John smiley on the third
+                gifImg.src = (errors[riddleId] < 3)
+                    ? "https://media.giphy.com/media/3o7TKtnuHOHHUjR38Y/giphy.gif"
+                    : "https://upload.wikimedia.org/wikipedia/en/5/53/Red_John_smiley_face.jpg";
                 gifImg.style.display = "block";
             }
 
