@@ -28,6 +28,41 @@
     <style>
         /* Scorrimento fluido quando si clicca sul menu */
         html { scroll-behavior: smooth; }
+
+        @media (max-width: 640px) {
+            .hero-video {
+                object-fit: cover;
+                object-position: center center;
+                background-color: #dff4fb;
+            }
+
+            .hero-content {
+                padding-top: 2rem;
+                padding-bottom: 2.5rem;
+            }
+
+            .hero-logo {
+                margin-top: 0;
+                margin-bottom: 1rem;
+                width: min(78vw, 20rem);
+                max-height: 8rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+                line-height: 1.08;
+                margin-bottom: 0.9rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.05rem;
+                margin-bottom: 1rem;
+            }
+
+            .hero-button {
+                margin-top: 0;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
@@ -37,7 +72,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex-shrink-0 flex items-center">
-                    <img src="/Lavasecco/logo2.png" alt="Lavasecco Niki" class="h-10 w-auto">
+                    <img src="logo.png" alt="Lavasecco Niki" class="h-10 w-auto">
                 </div>
                 <div class="hidden md:flex space-x-8">
                     <a href="#servizi" class="text-gray-600 hover:text-niki-fucsia font-medium">Servizi</a>
@@ -49,17 +84,18 @@
     </nav>
 
     <!-- SEZIONE HERO (Iniziale) -->
-    <header class="relative pt-16 flex items-center justify-center min-h-screen overflow-hidden bg-niki-azzurro">
-        <video autoplay muted loop playsinline class="absolute inset-0 h-full w-full object-cover opacity-40">
-            <source src="/Lavasecco/video-pubblicita.mp4" type="video/mp4">
-        </video>
-        <div class="absolute inset-0 bg-gradient-to-b from-white/25 via-niki-azzurro/28 to-white/48"></div>
-        <div class="relative z-10 text-center px-4 flex flex-col items-center">
-            <img src="/Lavasecco/logo2.png" alt="Logo Lavasecco Niki" class="mx-auto mt-10 md:mt-14 mb-3 w-72 sm:w-80 md:w-96 lg:w-[30rem] max-h-48 sm:max-h-52 md:max-h-56 h-auto object-contain" style="filter: drop-shadow(0 0 12px rgba(255,255,255,0.98)) drop-shadow(0 0 28px rgba(255,255,255,0.72));">
-            
-            <h1 class="text-5xl md:text-6xl font-bold mb-4 text-niki-viola">La cura perfetta per i tuoi capi</h1>
-            <p class="text-xl md:text-2xl mb-5 text-gray-700">Lavanderia, Sartoria e molto altro a Cremona.</p>
-            <a href="#contatti" class="relative z-20 mt-2 inline-block bg-niki-fucsia hover:bg-magenta-700 text-white font-bold py-3 px-8 rounded-full transition duration-300">Vieni a trovarci</a>
+    <header class="pt-16 bg-white">
+        <div class="relative overflow-hidden bg-niki-azzurro">
+            <video autoplay muted loop playsinline class="hero-video h-[56vh] w-full object-cover object-center sm:h-[62vh] md:h-[76vh]">
+                <source src="video-pubblicita.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="hero-content bg-white px-4 py-14 text-center">
+            <img src="logo2.png" alt="Logo Lavasecco Niki" class="hero-logo mx-auto mb-4 h-auto w-72 max-h-48 object-contain sm:w-80 md:w-96 lg:w-[30rem] md:max-h-56" style="filter: drop-shadow(0 0 12px rgba(255,255,255,0.98)) drop-shadow(0 0 28px rgba(255,255,255,0.72));">
+
+            <h1 class="hero-title text-5xl font-bold mb-4 text-niki-viola md:text-6xl">La cura perfetta per i tuoi capi</h1>
+            <p class="hero-subtitle text-xl mb-5 text-gray-700 md:text-2xl">Lavanderia, Sartoria e molto altro a Cremona.</p>
+            <a href="#contatti" class="hero-button relative z-20 mt-0 inline-block rounded-full bg-niki-fucsia py-3 px-8 font-bold text-white transition duration-300 hover:bg-magenta-700">Vieni a trovarci</a>
         </div>
     </header>
 
@@ -71,7 +107,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8">
                 <article class="group overflow-hidden rounded-2xl border-4 border-niki-viola bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                     <div class="aspect-[5/4] overflow-hidden bg-gray-100">
-                        <img src="/Lavasecco/lavanderia.jpg" alt="Lavanderia e lavasecco" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                        <img src="lavanderia.jpg" alt="Lavanderia e lavasecco" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                     </div>
                     <div class="p-6 text-center">
                         <h3 class="text-xl font-bold text-niki-viola mb-2">Lavanderia e Lavasecco</h3>
@@ -81,7 +117,7 @@
 
                 <article class="group overflow-hidden rounded-2xl border-4 border-niki-viola bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                     <div class="aspect-[5/4] overflow-hidden bg-gray-100">
-                        <img src="/Lavasecco/piumoni.jpg" alt="Piumoni sottovuoto" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                        <img src="piumoni.jpg" alt="Piumoni sottovuoto" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                     </div>
                     <div class="p-6 text-center">
                         <h3 class="text-xl font-bold text-niki-viola mb-2">Piumoni Sottovuoto</h3>
@@ -91,7 +127,7 @@
 
                 <article class="group overflow-hidden rounded-2xl border-4 border-niki-viola bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                     <div class="aspect-[5/4] overflow-hidden bg-gray-100">
-                        <img src="/Lavasecco/sartoria.jpg" alt="Riparazioni sartoriali" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                        <img src="sartoria.jpg" alt="Riparazioni sartoriali" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                     </div>
                     <div class="p-6 text-center">
                         <h3 class="text-xl font-bold text-niki-viola mb-2">Riparazioni Sartoriali</h3>
@@ -101,43 +137,51 @@
 
                 <article class="group overflow-hidden rounded-2xl border-4 border-niki-viola bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                     <div class="aspect-[5/4] overflow-hidden bg-gray-100">
-                        <img src="/Lavasecco/detersivi.jpg" alt="Detersivi e profumi" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                        <img src="detersivi.jpg" alt="Detersivi e profumi" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                     </div>
                     <div class="p-6 text-center">
                         <h3 class="text-xl font-bold text-niki-viola mb-2">Detersivi e Profumi</h3>
                         <p class="text-gray-600">Selezione di detersivi e profumi per il bucato, pensata per la cura quotidiana della casa.</p>
                     </div>
                 </article>
-            </div>
-        </div>
-    </section>
 
-    <!-- GALLERIA -->
-    <section class="py-16 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-niki-viola mb-3">Il nostro lavoro</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Lavanderia e sartoria raccontate attraverso le immagini del nostro lavoro quotidiano.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                 <article class="group overflow-hidden rounded-2xl border-4 border-niki-viola bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                     <div class="aspect-[5/4] overflow-hidden bg-gray-100">
-                        <img src="/Lavasecco/lavanderia.jpg" alt="Lavanderia" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                        <img src="pelle.jpg" alt="Lavaggio pelle" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                     </div>
-                    <div class="p-6 text-left">
-                        <h3 class="text-2xl font-bold text-niki-viola mb-2">Lavanderia</h3>
-                        <p class="text-gray-600">Cura dei capi, pulizia accurata e attenzione ai dettagli in ogni fase del lavaggio.</p>
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold text-niki-viola mb-2">Lavaggio Pelle</h3>
+                        <p class="text-gray-600">Trattamenti delicati per giacche, borse e capi in pelle, con attenzione alla morbidezza e alla finitura.</p>
                     </div>
                 </article>
 
                 <article class="group overflow-hidden rounded-2xl border-4 border-niki-viola bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                     <div class="aspect-[5/4] overflow-hidden bg-gray-100">
-                        <img src="/Lavasecco/sartoria.jpg" alt="Sartoria" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                        <img src="tappeto.jpg" alt="Lavaggio tappeti" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                     </div>
-                    <div class="p-6 text-left">
-                        <h3 class="text-2xl font-bold text-niki-viola mb-2">Sartoria</h3>
-                        <p class="text-gray-600">Riparazioni, modifiche e lavorazioni sartoriali per dare nuova vita ai tuoi capi.</p>
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold text-niki-viola mb-2">Lavaggio Tappeti</h3>
+                        <p class="text-gray-600">Pulizia accurata per tappeti piccoli e grandi, con rimozione dello sporco e rispetto delle fibre.</p>
+                    </div>
+                </article>
+
+                <article class="group overflow-hidden rounded-2xl border-4 border-niki-viola bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+                    <div class="aspect-[5/4] overflow-hidden bg-gray-100">
+                        <img src="creazione2.jpg" alt="Nuove creazioni sartoriali" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold text-niki-viola mb-2">Nuove Creazioni</h3>
+                        <p class="text-gray-600">Lavorazioni sartoriali su misura per adattare, rifinire o creare capi con uno stile unico.</p>
+                    </div>
+                </article>
+
+                <article class="group overflow-hidden rounded-2xl border-4 border-niki-viola bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+                    <div class="aspect-[5/4] overflow-hidden bg-gray-100">
+                        <img src="sposa.jpg" alt="Lavaggio e riparazione abiti da sposa" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold text-niki-viola mb-2">Abiti da Sposa</h3>
+                        <p class="text-gray-600">Lavaggio e riparazione degli abiti da sposa con cura speciale per tessuti delicati, dettagli e ricami.</p>
                     </div>
                 </article>
             </div>
@@ -214,8 +258,8 @@
                     </div>
                     <!-- Social personalizzati con colore niki-fucsia -->
                     <div class="pt-4 flex gap-4">
-                        <a href="https://www.facebook.com/p/Lavasecco-Niki-100063546152698/" class="text-gray-400 hover:text-niki-fucsia text-3xl transition" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                        <a href="https://www.instagram.com/lavasecco.niki/?hl=it" class="text-gray-400 hover:text-niki-fucsia text-3xl transition" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-niki-fucsia text-3xl transition" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-niki-fucsia text-3xl transition" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="https://wa.me/393200133425" class="text-gray-400 hover:text-green-500 text-3xl transition" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
