@@ -362,7 +362,7 @@
         if(unlocked) return openDay(d);
         const code = prompt(`Inserisci la password per sbloccare il Giorno ${d}:`);
         if(!code) return;
-        const pass = (d===2) ? 'SBLOCCO-MARTEDI' : (d===3) ? 'SBLOCCO-MERCOLEDI' : '';
+        const pass = (d===2) ? 'ProgettoSistemiElettroniciAnalogici' : (d===3) ? 'ViPoteteAlzareCheHoFretta?' : '';
         if(code.toUpperCase().trim() === pass) {
             localStorage.setItem(`day${d}_unlocked`, 'true');
             openDay(d);
