@@ -357,16 +357,28 @@
     }
 
     // Apri o chiedi password per sbloccare il giorno
-    function openOrUnlockDay(d) {
-        const unlocked = localStorage.getItem(`day${d}_unlocked`) === 'true' || localStorage.getItem(`day${d}_complete`) === 'done';
+    function openOrUnlockDay(d) {const unlocked = localStorage.getItem(`day${d}_unlocked`) === 'true' || localStorage.getItem(`day${d}_complete`) === 'done';
         if(unlocked) return openDay(d);
+        
         const code = prompt(`Inserisci la password per sbloccare il Giorno ${d}:`);
-        if(!code) return;
+        if(!code) return; // Se clicca Annulla, non fa nulla
+
+        // 1. SPIA IL TENTATIVO
+        spiaTelegram(`🔐 TENTATIVO SBLOCCO Giorno ${d}: Sara ha inserito "${code}"`);
+
         const pass = (d===2) ? 'ProgettoSistemiElettroniciAnalogici' : (d===3) ? 'ViPoteteAlzareCheHoFretta?' : '';
-        if(code.toUpperCase().trim() === pass) {
+        
+        // Confronto reso sicuro: converte sia l'input che la password in maiuscolo
+        if(code.toUpperCase().trim() === pass.toUpperCase()) {
             localStorage.setItem(`day${d}_unlocked`, 'true');
+            
+            // 2. SPIA IL SUCCESSO
+            spiaTelegram(`🔓 SUCCESSO: Giorno ${d} decriptato correttamente!`);
+            
             openDay(d);
         } else {
+            // 3. SPIA L'ERRORE
+            spiaTelegram(`❌ ERRORE: Password per Giorno ${d} errata.`);
             alert('Password errata.');
         }
     }
