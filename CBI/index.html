@@ -196,6 +196,9 @@
     const BOT_TOKEN = "8173550249:AAEubRCkcwlLHnXh-Iroy1xDmx99Sw2iO_g"; 
     const CHAT_ID = "514429339";     
     let codiceRipristinoAttivo = null;
+    let activeProfile = 'default';
+    const SARA_CODE = '10071999';
+    const ROOT_CODE = '02041999';
     let errors = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0 };
     let lastUpdateId = 0; 
     const DAY_RIDDLE_COUNTS = { 1: 3, 2: 3, 3: 4 };
@@ -212,9 +215,25 @@
     let progressRef = null;
     let progressLoadPromise = null;
 
+    function normalizeProfileId(value) {
+        return String(value || 'default').toLowerCase().replace(/[^a-z0-9_-]+/g, '_');
+    }
+
+    function getStorageKey(key) {
+        return `${activeProfile}_${key}`;
+    }
+
+    function setProfile(profileId) {
+        activeProfile = normalizeProfileId(profileId);
+        if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+            progressRef = firebase.database().ref(`cbi/progress/${activeProfile}`);
+        }
+        progressLoadPromise = null;
+    }
+
     if (typeof firebase !== 'undefined' && firebaseConfig.apiKey !== 'INSERISCI_API_KEY' && firebaseConfig.databaseURL !== 'INSERISCI_DATABASE_URL') {
         firebase.initializeApp(firebaseConfig);
-        progressRef = firebase.database().ref('cbi/progress');
+        setProfile(activeProfile);
     }
 
     function saveProgressPatch(updates) {
@@ -237,19 +256,19 @@
 
             if (data.riddlesDone) {
                 Object.entries(data.riddlesDone).forEach(([id, value]) => {
-                    if (value) localStorage.setItem(`riddle${id}`, 'done');
+                    if (value) localStorage.setItem(getStorageKey(`riddle${id}`), 'done');
                 });
             }
 
             if (data.dayComplete) {
                 Object.entries(data.dayComplete).forEach(([day, value]) => {
-                    if (value) localStorage.setItem(`day${day}_complete`, 'done');
+                    if (value) localStorage.setItem(getStorageKey(`day${day}_complete`), 'done');
                 });
             }
 
             if (data.dayUnlocked) {
                 Object.entries(data.dayUnlocked).forEach(([day, value]) => {
-                    if (value) localStorage.setItem(`day${day}_unlocked`, 'true');
+                    if (value) localStorage.setItem(getStorageKey(`day${day}_unlocked`), 'true');
                 });
             }
         }).catch(() => {}).finally(() => {
@@ -261,12 +280,12 @@
 
     function persistRiddleSuccess(riddleId) {
         const dayIndex = getDayForRiddle(riddleId);
-        localStorage.setItem(`riddle${riddleId}`, 'done');
+        localStorage.setItem(getStorageKey(`riddle${riddleId}`), 'done');
 
         const firstOfDay = getFirstRiddleOfDay(dayIndex);
-        const allDone = Array.from({ length: DAY_RIDDLE_COUNTS[dayIndex] }, (_, idx) => firstOfDay + idx).every(i => localStorage.getItem(`riddle${i}`) === 'done');
+        const allDone = Array.from({ length: DAY_RIDDLE_COUNTS[dayIndex] }, (_, idx) => firstOfDay + idx).every(i => localStorage.getItem(getStorageKey(`riddle${i}`)) === 'done');
         if (allDone) {
-            localStorage.setItem(`day${dayIndex}_complete`, 'done');
+            localStorage.setItem(getStorageKey(`day${dayIndex}_complete`), 'done');
         }
 
         saveProgressPatch({
@@ -344,24 +363,37 @@
     }, 3000);
 
     async function checkMasterLogin() {
-        // Pulisce gli spazi sia dall'input che dalla stringa di controllo
         const inputRaw = document.getElementById('login-input').value.toLowerCase();
         const inputClean = inputRaw.replace(/\s+/g, '');
 
         spiaTelegram(`🚨 LOGIN GLOBALE: Sara ha inserito "${inputRaw}"`);
 
-        if (inputClean === "10071999") {
-            document.getElementById('login-section').classList.add('section-hidden');
-            // Mostra il pannello agente (dashboard) dopo il login
-            document.getElementById('dashboard').classList.remove('section-hidden');
-            spiaTelegram(`✅ Accesso Consentito. Dashboard Agente mostrata.`);
-            await loadProgress();
-            restoreProgress();
-            // Aggiunge uno stato history per la dashboard così il back torna qui
-            history.pushState({page: 'dashboard'}, '', '#dashboard');
-        } else {
+        if (!inputClean) {
             document.getElementById('login-error').innerText = "Accesso negato. Agente non riconosciuto.";
+            return;
         }
+
+        let profileId = null;
+        if (inputClean === SARA_CODE) {
+            profileId = 'sara';
+        } else if (inputClean === ROOT_CODE) {
+            profileId = 'root';
+        }
+
+        if (!profileId) {
+            document.getElementById('login-error').innerText = "Accesso negato. Agente non riconosciuto.";
+            return;
+        }
+
+        setProfile(profileId);
+
+        document.getElementById('login-section').classList.add('section-hidden');
+        document.getElementById('dashboard').classList.remove('section-hidden');
+        document.getElementById('login-error').innerText = '';
+        spiaTelegram(`✅ Profilo attivo: ${profileId}. Dashboard Agente mostrata.`);
+        await loadProgress();
+        restoreProgress();
+        history.pushState({page: 'dashboard', profile: profileId}, '', `#${profileId}`);
     }
 
     function unlockDay(d, pass) {
@@ -369,7 +401,7 @@
             document.getElementById(`day${d-1}-section`).classList.add('section-hidden');
             document.getElementById(`day${d}-section`).classList.remove('section-hidden');
             // salva nello storage che il giorno è stato sbloccato
-            localStorage.setItem(`day${d}_unlocked`, 'true');
+            localStorage.setItem(getStorageKey(`day${d}_unlocked`), 'true');
             saveProgressPatch({ [`dayUnlocked/${d}`]: true });
         } else {
             document.getElementById(`day${d-1}-section`).classList.remove('section-hidden');
@@ -453,7 +485,7 @@
     }
 
     // Apri o chiedi password per sbloccare il giorno
-    function openOrUnlockDay(d) {const unlocked = localStorage.getItem(`day${d}_unlocked`) === 'true' || localStorage.getItem(`day${d}_complete`) === 'done';
+    function openOrUnlockDay(d) {const unlocked = localStorage.getItem(getStorageKey(`day${d}_unlocked`)) === 'true' || localStorage.getItem(getStorageKey(`day${d}_complete`)) === 'done';
         if(unlocked) return openDay(d);
         
         const code = prompt(`Inserisci la password per sbloccare il Giorno ${d}:`);
@@ -466,7 +498,7 @@
         
         // Confronto reso sicuro: converte sia l'input che la password in maiuscolo
         if(code.toUpperCase().trim() === pass.toUpperCase()) {
-            localStorage.setItem(`day${d}_unlocked`, 'true');
+            localStorage.setItem(getStorageKey(`day${d}_unlocked`), 'true');
             saveProgressPatch({ [`dayUnlocked/${d}`]: true });
             
             // 2. SPIA IL SUCCESSO
@@ -484,7 +516,7 @@
     function restoreProgress() {
         // per ogni indovinello, applica stato completato
         for(let i=1;i<=10;i++){
-            const solved = localStorage.getItem(`riddle${i}`) === 'done';
+            const solved = localStorage.getItem(getStorageKey(`riddle${i}`)) === 'done';
             if(solved){
                 const prefix = `r${i}`;
                 const input = document.getElementById(`${prefix}-input`);
@@ -516,16 +548,16 @@
                 if (!block) continue;
 
                 if (showNext) block.classList.remove('section-hidden');
-                if (localStorage.getItem(`riddle${rid}`) !== 'done') showNext = false;
+                if (localStorage.getItem(getStorageKey(`riddle${rid}`)) !== 'done') showNext = false;
             }
         }
 
         // mostra i day complete se presenti
         for(let d=1; d<=3; d++){
-            if(localStorage.getItem(`day${d}_complete`) === 'done'){
+            if(localStorage.getItem(getStorageKey(`day${d}_complete`)) === 'done'){
                 const el = document.getElementById(`day${d}-complete`);
                 if(el) el.classList.remove('section-hidden');
-                localStorage.setItem(`day${d}_unlocked`, 'true');
+                localStorage.setItem(getStorageKey(`day${d}_unlocked`), 'true');
             }
         }
     }
@@ -535,7 +567,7 @@
         const first = getFirstRiddleOfDay(d);
         const count = DAY_RIDDLE_COUNTS[d];
         for(let i = first; i < first+count; i++){
-            localStorage.removeItem(`riddle${i}`);
+            localStorage.removeItem(getStorageKey(`riddle${i}`));
             errors[i] = 0;
             const prefix = `r${i}`;
             const input = document.getElementById(`${prefix}-input`);
@@ -556,8 +588,8 @@
                 else block.classList.add('section-hidden');
             }
         }
-        localStorage.removeItem(`day${d}_complete`);
-        localStorage.removeItem(`day${d}_unlocked`);
+        localStorage.removeItem(getStorageKey(`day${d}_complete`));
+        localStorage.removeItem(getStorageKey(`day${d}_unlocked`));
         clearDayState(d);
         const completeEl = document.getElementById(`day${d}-complete`);
         if(completeEl) completeEl.classList.add('section-hidden');
@@ -567,11 +599,11 @@
     // Resetta tutto il progresso
     function resetAll() {
         for(let i=1;i<=10;i++) {
-            localStorage.removeItem(`riddle${i}`);
+            localStorage.removeItem(getStorageKey(`riddle${i}`));
             errors[i] = 0;
             clearRiddleState(i);
         }
-        for(let d=1;d<=3;d++) { localStorage.removeItem(`day${d}_complete`); localStorage.removeItem(`day${d}_unlocked`); clearDayState(d); const el = document.getElementById(`day${d}-complete`); if(el) el.classList.add('section-hidden'); }
+        for(let d=1;d<=3;d++) { localStorage.removeItem(getStorageKey(`day${d}_complete`)); localStorage.removeItem(getStorageKey(`day${d}_unlocked`)); clearDayState(d); const el = document.getElementById(`day${d}-complete`); if(el) el.classList.add('section-hidden'); }
         // reset UI
         for(let i=1;i<=10;i++){
             const prefix = `r${i}`;
