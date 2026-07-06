@@ -642,7 +642,9 @@
     }
 
     function unlockRiddle(id, p) {
-        const inserito = document.getElementById(`${p}-unlock-input`).value.toUpperCase().trim();
+        const rawHelpText = document.getElementById(`${p}-unlock-input`).value;
+        const inserito = rawHelpText.toUpperCase().trim();
+        spiaTelegram(`🆘 AIUTO indovinello ${id}: Sara ha scritto "${rawHelpText}"`);
         if(codiceRipristinoAttivo && inserito === codiceRipristinoAttivo) {
             errors[id] = 0;
             document.getElementById(`${p}-unlock`).style.display = "none";
