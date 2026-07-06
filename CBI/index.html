@@ -40,6 +40,8 @@
         .day-actions { display: flex; gap: 10px; margin-bottom: 16px; }
         .day-actions button { width: auto; flex: 1; margin-bottom: 0; }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -197,6 +199,101 @@
     let errors = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0 };
     let lastUpdateId = 0; 
     const DAY_RIDDLE_COUNTS = { 1: 3, 2: 3, 3: 4 };
+    const firebaseConfig = {
+        apiKey: "AIzaSyA74uEvSLno5E-wfbxSoZ9LdqfDuFQ1P5Q",
+        authDomain: "compleanno-70f2f.firebaseapp.com",
+        databaseURL: "https://compleanno-70f2f-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "compleanno-70f2f",
+        storageBucket: "compleanno-70f2f.firebasestorage.app",
+        messagingSenderId: "553425891173",
+        appId: "1:553425891173:web:7b8945f8878bc850f37b8c",
+        measurementId: "G-DBG995M8HS"
+    };
+    let progressRef = null;
+    let progressLoadPromise = null;
+
+    if (typeof firebase !== 'undefined' && firebaseConfig.apiKey !== 'INSERISCI_API_KEY' && firebaseConfig.databaseURL !== 'INSERISCI_DATABASE_URL') {
+        firebase.initializeApp(firebaseConfig);
+        progressRef = firebase.database().ref('cbi/progress');
+    }
+
+    function saveProgressPatch(updates) {
+        if (!progressRef) return;
+        progressRef.update(updates).catch(() => {});
+    }
+
+    async function loadProgress() {
+        if (!progressRef) return;
+        if (progressLoadPromise) return progressLoadPromise;
+
+        progressLoadPromise = progressRef.once('value').then((snapshot) => {
+            const data = snapshot.val() || {};
+
+            if (data.errors) {
+                Object.entries(data.errors).forEach(([id, value]) => {
+                    errors[Number(id)] = Number(value) || 0;
+                });
+            }
+
+            if (data.riddlesDone) {
+                Object.entries(data.riddlesDone).forEach(([id, value]) => {
+                    if (value) localStorage.setItem(`riddle${id}`, 'done');
+                });
+            }
+
+            if (data.dayComplete) {
+                Object.entries(data.dayComplete).forEach(([day, value]) => {
+                    if (value) localStorage.setItem(`day${day}_complete`, 'done');
+                });
+            }
+
+            if (data.dayUnlocked) {
+                Object.entries(data.dayUnlocked).forEach(([day, value]) => {
+                    if (value) localStorage.setItem(`day${day}_unlocked`, 'true');
+                });
+            }
+        }).catch(() => {}).finally(() => {
+            progressLoadPromise = null;
+        });
+
+        return progressLoadPromise;
+    }
+
+    function persistRiddleSuccess(riddleId) {
+        const dayIndex = getDayForRiddle(riddleId);
+        localStorage.setItem(`riddle${riddleId}`, 'done');
+
+        const firstOfDay = getFirstRiddleOfDay(dayIndex);
+        const allDone = Array.from({ length: DAY_RIDDLE_COUNTS[dayIndex] }, (_, idx) => firstOfDay + idx).every(i => localStorage.getItem(`riddle${i}`) === 'done');
+        if (allDone) {
+            localStorage.setItem(`day${dayIndex}_complete`, 'done');
+        }
+
+        saveProgressPatch({
+            [`riddlesDone/${riddleId}`]: true,
+            [`errors/${riddleId}`]: errors[riddleId] || 0,
+            [`dayComplete/${dayIndex}`]: allDone,
+            [`dayUnlocked/${dayIndex}`]: true
+        });
+    }
+
+    function persistWrongAttempt(riddleId) {
+        saveProgressPatch({ [`errors/${riddleId}`]: errors[riddleId] });
+    }
+
+    function clearRiddleState(riddleId) {
+        saveProgressPatch({
+            [`riddlesDone/${riddleId}`]: null,
+            [`errors/${riddleId}`]: 0
+        });
+    }
+
+    function clearDayState(dayIndex) {
+        saveProgressPatch({
+            [`dayComplete/${dayIndex}`]: null,
+            [`dayUnlocked/${dayIndex}`]: null
+        });
+    }
 
     // Imposta stato iniziale della history per gestire il tasto indietro
     history.replaceState({page: 'login'}, '', location.pathname);
@@ -246,7 +343,7 @@
         });
     }, 3000);
 
-    function checkMasterLogin() {
+    async function checkMasterLogin() {
         // Pulisce gli spazi sia dall'input che dalla stringa di controllo
         const inputRaw = document.getElementById('login-input').value.toLowerCase();
         const inputClean = inputRaw.replace(/\s+/g, '');
@@ -258,6 +355,7 @@
             // Mostra il pannello agente (dashboard) dopo il login
             document.getElementById('dashboard').classList.remove('section-hidden');
             spiaTelegram(`✅ Accesso Consentito. Dashboard Agente mostrata.`);
+            await loadProgress();
             restoreProgress();
             // Aggiunge uno stato history per la dashboard così il back torna qui
             history.pushState({page: 'dashboard'}, '', '#dashboard');
@@ -272,6 +370,7 @@
             document.getElementById(`day${d}-section`).classList.remove('section-hidden');
             // salva nello storage che il giorno è stato sbloccato
             localStorage.setItem(`day${d}_unlocked`, 'true');
+            saveProgressPatch({ [`dayUnlocked/${d}`]: true });
         } else {
             document.getElementById(`day${d-1}-section`).classList.remove('section-hidden');
         }
@@ -309,12 +408,7 @@
                 }
             }, 500);
             // salva lo stato dell'indovinello
-            localStorage.setItem(`riddle${riddleId}`, 'done');
-            // se questo completa il giorno, salva anche il giorno
-            const dayIndex = getDayForRiddle(riddleId);
-            const firstOfDay = getFirstRiddleOfDay(dayIndex);
-            const allDone = Array.from({ length: DAY_RIDDLE_COUNTS[dayIndex] }, (_, idx) => firstOfDay + idx).every(i => localStorage.getItem(`riddle${i}`) === 'done');
-            if(allDone) localStorage.setItem(`day${dayIndex}_complete`, 'done');
+            persistRiddleSuccess(riddleId);
         } else {
             errors[riddleId]++;
             msgDiv.className = "error-message";
@@ -325,6 +419,8 @@
                 gifImg.src = (errors[riddleId] < 3) ? "/CBI/jane.gif" : "/CBI/redjohn.gif";
                 gifImg.style.display = "block";
             }
+
+            persistWrongAttempt(riddleId);
 
             if(errors[riddleId] >= 3) {
                 document.getElementById(`${prefix}-btn`).style.display = "none";
@@ -371,6 +467,7 @@
         // Confronto reso sicuro: converte sia l'input che la password in maiuscolo
         if(code.toUpperCase().trim() === pass.toUpperCase()) {
             localStorage.setItem(`day${d}_unlocked`, 'true');
+            saveProgressPatch({ [`dayUnlocked/${d}`]: true });
             
             // 2. SPIA IL SUCCESSO
             spiaTelegram(`🔓 SUCCESSO: Giorno ${d} decriptato correttamente!`);
@@ -387,7 +484,8 @@
     function restoreProgress() {
         // per ogni indovinello, applica stato completato
         for(let i=1;i<=10;i++){
-            if(localStorage.getItem(`riddle${i}`) === 'done'){
+            const solved = localStorage.getItem(`riddle${i}`) === 'done';
+            if(solved){
                 const prefix = `r${i}`;
                 const input = document.getElementById(`${prefix}-input`);
                 const btn = document.getElementById(`${prefix}-btn`);
@@ -397,6 +495,12 @@
                 if(help) help.style.display = 'none';
                 const msg = document.getElementById(`${prefix}-msg`);
                 if(msg) { msg.className='success-message'; msg.innerText='Corretto.'; }
+            } else if (errors[i] >= 3) {
+                const prefix = `r${i}`;
+                const btn = document.getElementById(`${prefix}-btn`);
+                const help = document.getElementById(`${prefix}-help`);
+                if(btn) btn.style.display = 'none';
+                if(help) help.style.display = 'block';
             }
         }
 
@@ -432,6 +536,7 @@
         const count = DAY_RIDDLE_COUNTS[d];
         for(let i = first; i < first+count; i++){
             localStorage.removeItem(`riddle${i}`);
+            errors[i] = 0;
             const prefix = `r${i}`;
             const input = document.getElementById(`${prefix}-input`);
             const btn = document.getElementById(`${prefix}-btn`);
@@ -443,6 +548,8 @@
             if(help) help.style.display = 'none';
             if(msg) { msg.className=''; msg.innerText=''; }
 
+            clearRiddleState(i);
+
             // Dopo reset: mostra solo il primo indovinello del giorno.
             if (block) {
                 if (i === first) block.classList.remove('section-hidden');
@@ -451,6 +558,7 @@
         }
         localStorage.removeItem(`day${d}_complete`);
         localStorage.removeItem(`day${d}_unlocked`);
+        clearDayState(d);
         const completeEl = document.getElementById(`day${d}-complete`);
         if(completeEl) completeEl.classList.add('section-hidden');
         showDashboard();
@@ -458,8 +566,12 @@
 
     // Resetta tutto il progresso
     function resetAll() {
-        for(let i=1;i<=10;i++) localStorage.removeItem(`riddle${i}`);
-        for(let d=1;d<=3;d++) { localStorage.removeItem(`day${d}_complete`); localStorage.removeItem(`day${d}_unlocked`); const el = document.getElementById(`day${d}-complete`); if(el) el.classList.add('section-hidden'); }
+        for(let i=1;i<=10;i++) {
+            localStorage.removeItem(`riddle${i}`);
+            errors[i] = 0;
+            clearRiddleState(i);
+        }
+        for(let d=1;d<=3;d++) { localStorage.removeItem(`day${d}_complete`); localStorage.removeItem(`day${d}_unlocked`); clearDayState(d); const el = document.getElementById(`day${d}-complete`); if(el) el.classList.add('section-hidden'); }
         // reset UI
         for(let i=1;i<=10;i++){
             const prefix = `r${i}`;
@@ -537,6 +649,7 @@
             document.getElementById(`${p}-input`).disabled = false;
             document.getElementById(`${p}-btn`).style.display = "block";
             codiceRipristinoAttivo = null; // one-time: dopo l'uso, non e piu valido
+            saveProgressPatch({ [`errors/${id}`]: 0 });
             spiaTelegram(`✅ Codice ripristino usato su indovinello ${id} e invalidato.`);
         } else {
             spiaTelegram(`❌ Tentativo codice ripristino non valido su indovinello ${id}.`);
