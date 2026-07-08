@@ -6,7 +6,8 @@
     <title>C.B.I. - Concesio Bureau of Investigation</title>
     <style>
         body { background-color: #121820; color: #e0e6ed; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { background-color: #1a222d; border: 1px solid #2d3b4e; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 600px; padding: 30px; box-sizing: border-box; position: relative; }
+        body.day3-active { overflow-x: hidden; }
+        .container { background-color: #1a222d; border: 1px solid #2d3b4e; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 600px; padding: 30px; box-sizing: border-box; position: relative; z-index: 2; }
         .header { text-align: center; border-bottom: 2px solid #3498db; padding-bottom: 20px; margin-bottom: 25px; }
         .header h1 { margin: 0; color: #3498db; font-size: 24px; letter-spacing: 2px; }
         .header p { margin: 5px 0 0 0; font-size: 12px; color: #7f8c8d; text-transform: uppercase; font-weight: bold; }
@@ -40,11 +41,17 @@
         .dashboard-dossier em { color: #f1c40f; font-style: normal; font-weight: 700; }
         .day-actions { display: flex; gap: 10px; margin-bottom: 16px; }
         .day-actions button { width: auto; flex: 1; margin-bottom: 0; }
+        .emoji-rain-layer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; display: none; }
+        body.day3-active .emoji-rain-layer { display: block; }
+        .emoji-rain-particle { position: absolute; top: -80px; width: var(--size); height: var(--size); opacity: 0.45; object-fit: contain; filter: drop-shadow(0 0 10px rgba(255, 92, 92, 0.5)); animation: emojiFall var(--duration) linear infinite; animation-delay: var(--delay); transform: translate3d(0, 0, 0); }
+        @keyframes emojiFall { 0% { transform: translate3d(0, -12vh, 0) rotate(0deg); } 100% { transform: translate3d(0, 112vh, 0) rotate(180deg); } }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 </head>
 <body>
+
+    <div id="day3-emoji-rain" class="emoji-rain-layer" aria-hidden="true"></div>
 
     <div id="hacker-box">
         <h2>⚠️ SYSTEM OVERRIDE</h2>
@@ -543,6 +550,36 @@
         return 7;
     }
 
+    const DAY3_EMOJI_IMAGE = 'Arrabbiata2.png';
+    let day3RainInitialized = false;
+
+    function ensureDay3EmojiRain() {
+        if (day3RainInitialized) return;
+        const layer = document.getElementById('day3-emoji-rain');
+        if (!layer) return;
+
+        const particleCount = 14;
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('img');
+            particle.className = 'emoji-rain-particle';
+            particle.alt = '';
+            particle.src = DAY3_EMOJI_IMAGE;
+            particle.style.left = `${Math.random() * 100}%`;
+            const baseSize = Math.max(150, Math.min(160, window.innerWidth * 0.1));
+            particle.style.setProperty('--size', `${baseSize + Math.random() * 24}px`);
+            particle.style.setProperty('--duration', `${7 + Math.random() * 6}s`);
+            particle.style.setProperty('--delay', `${Math.random() * -12}s`);
+            layer.appendChild(particle);
+        }
+
+        day3RainInitialized = true;
+    }
+
+    function setDay3Chaos(active) {
+        document.body.classList.toggle('day3-active', !!active);
+        if (active) ensureDay3EmojiRain();
+    }
+
     // Apri una giornata dalla dashboard
     function openDay(d) {
         // nasconde dashboard e mostra la sezione richiesta
@@ -550,6 +587,7 @@
         document.getElementById(`day${d}-section`).classList.remove('section-hidden');
         // nasconde eventuali altre day sections
         for(let i=1;i<=3;i++) if(i!==d) document.getElementById(`day${i}-section`).classList.add('section-hidden');
+        setDay3Chaos(d === 3);
         // registra lo stato nella history così il pulsante indietro torna alla dashboard
         history.pushState({page: 'day', day: d}, '', `#day${d}`);
     }
@@ -714,6 +752,7 @@
         // nasconde tutte le day sections e mostra dashboard
         for(let i=1;i<=3;i++) document.getElementById(`day${i}-section`).classList.add('section-hidden');
         document.getElementById('dashboard').classList.remove('section-hidden');
+        setDay3Chaos(false);
     }
 
     // Gestore della navigation: mostra vista corretta in base allo stato
@@ -736,6 +775,7 @@
             for(let i=1;i<=3;i++) document.getElementById(`day${i}-section`).classList.add('section-hidden');
             const d = state.day || 1;
             document.getElementById(`day${d}-section`).classList.remove('section-hidden');
+            setDay3Chaos(d === 3);
             return;
         }
     }
