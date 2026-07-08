@@ -26,6 +26,7 @@
         .riddle-block { border: 1px solid #34495e; padding: 15px; border-radius: 6px; margin-bottom: 20px; background-color: #161c24; }
         .riddle-title { display: block; text-align: center; font-weight: 700; margin-bottom: 8px; }
         .riddle-text { display: block; }
+        .day3-chaos-input { display: inline-block; transition: transform 0.16s ease, box-shadow 0.16s ease; will-change: transform; position: relative; z-index: 1; }
         
         #hacker-box { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #050505; border: 2px solid #ff0000; padding: 25px; border-radius: 8px; box-shadow: 0 0 30px rgba(255,0,0,0.7), inset 0 0 15px rgba(255,0,0,0.3); width: 90%; max-width: 400px; z-index: 9999; display: none; animation: hackerPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes hackerPop { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
@@ -157,28 +158,28 @@
             </div>
             <div id="riddle7-block" class="riddle-block">
                 <p><span class="riddle-title">7. [ADDESTRAMENTO TATTICO]</span><span class="riddle-text">Per testare le capacità del sospettato, lei stessa lo ha sottoposto alla visione obbligata di un noto "formatore" televisivo. Qual è l'esatto episodio di "The Mentalist" con cui ha avviato il suo addestramento?</span></p>
-                <input type="text" id="r7-input"><button onclick="verifyAnswer(7, ['20', '2x20', 's2e20', 'episodio20', 'stagione2episodio20', 'ep20', 'episodio20stagione2'], 'r7')" id="r7-btn">VERIFICA</button>
+                <input type="text" id="r7-input" class="day3-chaos-input"><button onclick="verifyAnswer(7, ['20', '2x20', 's2e20', 'episodio20', 'stagione2episodio20', 'ep20', 'episodio20stagione2'], 'r7')" id="r7-btn">VERIFICA</button>
                 <div id="r7-msg"></div><div class="gif-container"><img id="r7-gif" src=""></div>
                 <button id="r7-help" class="btn-danger" onclick="requestHelp(7, 'r7')">AIUTO</button>
                 <div id="r7-unlock" class="unlock-container"><input type="text" id="r7-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(7, 'r7')">SBLOCCA</button></div>
             </div>
             <div id="riddle8-block" class="riddle-block section-hidden">
                 <p><span class="riddle-title">8. [ATTIVITÀ SOTTO "COPERTA"]</span><span class="riddle-text">I registri ambientali segnalano un momento specifico in cui le distanze di sicurezza si sono azzerate e la "copertura" è del tutto saltata. Quale film stava scorrendo sullo schermo in sottofondo durante questa intensa operazione ravvicinata?</span></p>
-                <input type="text" id="r8-input"><button onclick="verifyAnswer(8, ['karatekid', 'karatekidlegenda', 'karatekidlalegenda'], 'r8')" id="r8-btn">VERIFICA</button>
+                <input type="text" id="r8-input" class="day3-chaos-input"><button onclick="verifyAnswer(8, ['karatekid', 'karatekidlegenda', 'karatekidlalegenda'], 'r8')" id="r8-btn">VERIFICA</button>
                 <div id="r8-msg"></div><div class="gif-container"><img id="r8-gif" src=""></div>
                 <button id="r8-help" class="btn-danger" onclick="requestHelp(8, 'r8')">AIUTO</button>
                 <div id="r8-unlock" class="unlock-container"><input type="text" id="r8-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(8, 'r8')">SBLOCCA</button></div>
             </div>
             <div id="riddle9-block" class="riddle-block section-hidden">
                 <p><span class="riddle-title">9. [DECODIFICA SORGENTE]</span><span class="riddle-text">Durante le prime fasi di pedinamento digitale, l'Agente ha cercato di decifrare il lavoro del sospettato, paragonandolo incautamente a linguaggi statistici a lei più noti. In realtà, il criminale stava operando a un livello molto più basso. Quale oscuro linguaggio stava utilizzando?</span></p>
-                <input type="text" id="r9-input"><button onclick="verifyAnswer(9, ['vhdl'], 'r9')" id="r9-btn">VERIFICA</button>
+                <input type="text" id="r9-input" class="day3-chaos-input"><button onclick="verifyAnswer(9, ['vhdl'], 'r9')" id="r9-btn">VERIFICA</button>
                 <div id="r9-msg"></div><div class="gif-container"><img id="r9-gif" src=""></div>
                 <button id="r9-help" class="btn-danger" onclick="requestHelp(9, 'r9')">AIUTO</button>
                 <div id="r9-unlock" class="unlock-container"><input type="text" id="r9-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(9, 'r9')">SBLOCCA</button></div>
             </div>
             <div id="riddle10-block" class="riddle-block section-hidden">
                 <p><span class="riddle-title">10. [RAPPORTO CORRUZIONE]</span><span class="riddle-text">Fascicolo conclusivo. Il sospettato ha tentato ripetutamente di ammorbidire l'Agente Sara con omaggi floreali non autorizzati. Faccia il conteggio totale: quanti tulipani le ha consegnato ufficialmente fino ad oggi?</span></p>
-                <input type="text" id="r10-input"><button onclick="verifyAnswer(10, ['11', 'undici'], 'r10')" id="r10-btn">VERIFICA</button>
+                <input type="text" id="r10-input" class="day3-chaos-input"><button onclick="verifyAnswer(10, ['11', 'undici'], 'r10')" id="r10-btn">VERIFICA</button>
                 <div id="r10-msg"></div><div class="gif-container"><img id="r10-gif" src=""></div>
                 <button id="r10-help" class="btn-danger" onclick="requestHelp(10, 'r10')">AIUTO</button>
                 <div id="r10-unlock" class="unlock-container"><input type="text" id="r10-unlock-input" placeholder="Codice..."><button onclick="unlockRiddle(10, 'r10')">SBLOCCA</button></div>
@@ -768,6 +769,31 @@
         }
     }
 
+    function setupMovingDay3Inputs() {
+        for (let i = 7; i <= 10; i++) {
+            const input = document.getElementById(`r${i}-input`);
+            if (!input) continue;
+
+            let offsetX = 0;
+            let offsetY = 0;
+
+            input.addEventListener('input', () => {
+                if (input.disabled) return;
+                offsetX = Math.max(-85, Math.min(85, (Math.random() * 170) - 85));
+                offsetY = Math.max(-55, Math.min(55, (Math.random() * 110) - 55));
+                input.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+                input.style.boxShadow = '0 0 0 1px rgba(52, 152, 219, 0.35)';
+            });
+
+            input.addEventListener('blur', () => {
+                input.style.transform = 'translate(0, 0)';
+                input.style.boxShadow = '';
+                offsetX = 0;
+                offsetY = 0;
+            });
+        }
+    }
+
     function bindEnterKey(inputId, action) {
         const el = document.getElementById(inputId);
         if (!el) return;
@@ -793,6 +819,7 @@
     }
 
     setupEnterShortcuts();
+    setupMovingDay3Inputs();
     </script>
 </body>
 </html>
