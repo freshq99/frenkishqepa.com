@@ -42,8 +42,11 @@
         .day-actions { display: flex; gap: 10px; margin-bottom: 16px; }
         .day-actions button { width: auto; flex: 1; margin-bottom: 0; }
         .emoji-rain-layer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; display: none; }
+        .emoji-rain-front { z-index: 3; }
         body.day3-active .emoji-rain-layer { display: block; }
+        body.day3-active .emoji-rain-front { display: block; }
         .emoji-rain-particle { position: absolute; top: -80px; width: var(--size); height: var(--size); opacity: 0.45; object-fit: contain; filter: drop-shadow(0 0 10px rgba(255, 92, 92, 0.5)); animation: emojiFall var(--duration) linear infinite; animation-delay: var(--delay); transform: translate3d(0, 0, 0); }
+        .emoji-rain-front .emoji-rain-particle { opacity: 0.72; filter: drop-shadow(0 0 14px rgba(255, 92, 92, 0.65)); }
         @keyframes emojiFall { 0% { transform: translate3d(0, -12vh, 0) rotate(0deg); } 100% { transform: translate3d(0, 112vh, 0) rotate(180deg); } }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -52,6 +55,7 @@
 <body>
 
     <div id="day3-emoji-rain" class="emoji-rain-layer" aria-hidden="true"></div>
+    <div id="day3-emoji-rain-front" class="emoji-rain-layer emoji-rain-front" aria-hidden="true"></div>
 
     <div id="hacker-box">
         <h2>⚠️ SYSTEM OVERRIDE</h2>
@@ -555,8 +559,9 @@
 
     function ensureDay3EmojiRain() {
         if (day3RainInitialized) return;
-        const layer = document.getElementById('day3-emoji-rain');
-        if (!layer) return;
+        const backLayer = document.getElementById('day3-emoji-rain');
+        const frontLayer = document.getElementById('day3-emoji-rain-front');
+        if (!backLayer || !frontLayer) return;
 
         const particleCount = 14;
         for (let i = 0; i < particleCount; i++) {
@@ -564,12 +569,18 @@
             particle.className = 'emoji-rain-particle';
             particle.alt = '';
             particle.src = DAY3_EMOJI_IMAGE;
-            particle.style.left = `${Math.random() * 100}%`;
+            const xOffset = 6 + Math.random() * 88;
+            particle.style.left = `${xOffset}%`;
             const baseSize = Math.max(170, Math.min(160, window.innerWidth * 0.1));
             particle.style.setProperty('--size', `${baseSize + Math.random() * 24}px`);
             particle.style.setProperty('--duration', `${7 + Math.random() * 6}s`);
             particle.style.setProperty('--delay', `${Math.random() * -12}s`);
-            layer.appendChild(particle);
+            if (i % 3 === 0) {
+                particle.style.zIndex = '4';
+                frontLayer.appendChild(particle);
+            } else {
+                backLayer.appendChild(particle);
+            }
         }
 
         day3RainInitialized = true;
