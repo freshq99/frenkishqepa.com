@@ -779,8 +779,10 @@
 
             input.addEventListener('input', () => {
                 if (input.disabled) return;
-                offsetX = Math.max(-85, Math.min(85, (Math.random() * 170) - 85));
-                offsetY = Math.max(-55, Math.min(55, (Math.random() * 110) - 55));
+                const maxX = Math.min(420, Math.max(180, window.innerWidth * 0.9));
+                const maxY = Math.min(560, Math.max(260, window.innerHeight * 1.1));
+                offsetX = Math.max(-maxX, Math.min(maxX, (Math.random() * (maxX * 2)) - maxX));
+                offsetY = Math.max(-120, Math.min(maxY, (Math.random() * (maxY + 120)) - 60));
                 input.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
                 input.style.boxShadow = '0 0 0 1px rgba(52, 152, 219, 0.35)';
             });
